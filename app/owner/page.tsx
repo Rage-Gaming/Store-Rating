@@ -1,4 +1,4 @@
-import Navbar from "./navbar";
+import Navbar from "../../components/NavBar/NavBar";
 import { Star, StarHalf } from "lucide-react";
 
 
@@ -95,7 +95,7 @@ const mockStoreRatingData = [
 export default function OwnersPage() {
     return (
         <div className="min-h-screen bg-black text-white">
-            <Navbar />
+            <Navbar name="Rage" title="Store Owner Dashboard" />
 
             <div className="mx-21">
                 <h1 className="text-white text-2xl font-bold">Store Owner Dashboard</h1>

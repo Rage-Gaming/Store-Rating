@@ -1,16 +1,18 @@
 'use client'
 
-
 import DropdownMenuComponent from "@/components/Dropdown/dropdown";
+import DialogInputBox from "@/components/Dialog/dialogInputBox";
 import { useState } from "react";
 import { redirect } from 'next/navigation'
-import DialogInputBox from "@/components/Dialog/dialogInputBox";
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input"
 
-export default function Navbar() {
-    const [name, setName] = useState<string>("Rage");
+type NavBarProps = {
+    name: string;
+    title: string;
+};
+
+export default function Navbar({ name, title }: NavBarProps) {
     const [openDialog, setOpenDialog] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [currentPassword, setCurrentPassword] = useState<string>("");
@@ -29,9 +31,9 @@ export default function Navbar() {
         setError(null);
     };
 
-    return (
-        <div className="h-20 bg-zinc-900 flex items-center justify-between shadow-md mb-8 px-21">
-            <h1 className="text-white text-3xl text-center font-bold">Dashboard</h1>
+    return(
+        <div className="h-20 bg-zinc-900 flex items-center justify-between shadow-md px-21">
+            <h1 className="text-white text-3xl text-center font-bold">{title}</h1>
             <DropdownMenuComponent
                 buttonName={name}
                 items={[
@@ -44,7 +46,7 @@ export default function Navbar() {
                     {
                         label: "Logout",
                         onSelect: () => {
-                            console.log("Redirect to login")
+                            redirect('/login')
                         },
                     },
                 ]}
@@ -59,19 +61,18 @@ export default function Navbar() {
                 {error && <h1 className="text-[#e40202]">{error}</h1>}
                 <div className="grid gap-3">
                     <Label htmlFor="name" defaultValue={currentPassword}>Current Password</Label>
-                    <Input id="name" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
+                    <Input placeholder="Enter current password" id="name" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
                 </div>
                 <div className="grid gap-3">
                     <Label htmlFor="username" defaultValue={newPassword}>New Password</Label>
-                    <Input id="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+                    <Input placeholder="Enter new password" id="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
                 </div>
                 <div className="grid gap-3">
                     <Label htmlFor="username" defaultValue={repeatNewPassword}>Repeat New Password</Label>
-                    <Input id="password_repeat" value={repeatNewPassword} onChange={(e) => setRepeatNewPassword(e.target.value)} />
+                    <Input placeholder="Repeat new password" id="password_repeat" value={repeatNewPassword} onChange={(e) => setRepeatNewPassword(e.target.value)} />
                 </div>
 
             </DialogInputBox>
         </div>
     )
 }
-
