@@ -45,7 +45,7 @@ export default function DialogInputBox({
           <Button
             onClick={() => {
               onSave?.()
-            //   onOpenChange(false)
+              onOpenChange(false)
             }}
           >
             Save

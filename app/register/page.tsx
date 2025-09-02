@@ -1,6 +1,7 @@
 'use client'
 
 import {useState} from 'react';
+import { redirect } from 'next/navigation';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -11,21 +12,46 @@ export default function RegisterPage() {
     confirmPassword: '',
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
-    setFormData((prev) => ({ ...prev, [id]: value }));
-  };
-
   const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    console.log(formData)
+
+    const res = await fetch("/api/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      // Handle successful registration (e.g., redirect to login)
+      redirect('/login');
+    }
+
+    if (!data.success) {
+      setError(data.error);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="bg-zinc-800 p-8 rounded-2xl shadow-lg w-full max-w-lg">
         <h1 className="text-2xl font-bold mb-6 text-center">Register</h1>
         {error && <p className="text-red-500 text-sm my-4">{error}</p>}
-        <form className="flex flex-col space-y-2">
+        <form onSubmit={handleSubmit} className="flex flex-col space-y-2">
           <label htmlFor="username" className="text-sm font-medium">Username</label>
           <input
+            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
             type="text"
             id="username"
             placeholder="Username"
@@ -34,6 +60,7 @@ export default function RegisterPage() {
           />
           <label htmlFor="email" className="text-sm font-medium">Email</label>
           <input
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             type="email"
             id="email"
             placeholder="Email"
@@ -42,6 +69,7 @@ export default function RegisterPage() {
           />
           <label htmlFor="address" className="text-sm font-medium">Address</label>
           <input
+            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
             type="text"
             id="address"
             placeholder="Address"
@@ -50,6 +78,7 @@ export default function RegisterPage() {
           />
           <label htmlFor="password" className="text-sm font-medium">Password</label>
           <input
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             type="password"
             id="password"
             placeholder="Password"
@@ -58,6 +87,7 @@ export default function RegisterPage() {
           />
           <label htmlFor="confirm-password" className="text-sm font-medium">Confirm Password</label>
           <input
+            onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
             type="password"
             id="confirm-password"
             placeholder="Confirm Password"

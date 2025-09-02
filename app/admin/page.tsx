@@ -105,7 +105,6 @@ const mockStoreData = [
 ]
 
 export default function AdminPage() {
-    // track which section is active
     const [activeSection, setActiveSection] = useState("Dashboard");
 
     const [name, setName] = useState("");
@@ -132,18 +131,15 @@ export default function AdminPage() {
         );
     });
 
-    // sidebar items
     const menuItems = ["Dashboard", "Users", "Stores"];
 
     return (
         <div className="min-h-screen flex flex-col">
-            {/* Navbar */}
             {/* <div className="bg-red-600 text-white"> */}
             <Navbar name="Rage" title="System Administrator" />
             {/* </div> */}
 
             <div className="flex flex-1">
-                {/* Sidebar */}
                 <aside className="w-64 bg-black border-r">
                     <nav className="flex flex-col p-2 space-y-2">
                         {menuItems.map((item) => (
@@ -161,7 +157,6 @@ export default function AdminPage() {
                     </nav>
                 </aside>
 
-                {/* Main Content */}
                 <main className="flex-1 p-6 bg-black">
                     {activeSection === "Dashboard" && (
                         <div>

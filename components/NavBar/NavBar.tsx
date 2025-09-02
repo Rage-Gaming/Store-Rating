@@ -3,9 +3,9 @@
 import DropdownMenuComponent from "@/components/Dropdown/dropdown";
 import DialogInputBox from "@/components/Dialog/dialogInputBox";
 import { useState } from "react";
-import { redirect } from 'next/navigation'
+import { redirect } from 'next/navigation';
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input"
+import { Input } from "@/components/ui/input";
 
 type NavBarProps = {
     name: string;
