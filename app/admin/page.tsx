@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import  DrawerDemo from "../../components/Drawer/Drawer";
+import DrawerDemo from "../../components/Drawer/Drawer";
 
 const mockUsersData = [
     {
@@ -236,97 +236,99 @@ export default function AdminPage() {
                             </div>
                         </div>
                     )}  {activeSection === "Users" && (
-                        <div className="p-6">
-                            <h2 className="text-2xl font-bold mb-4">Users</h2>
-                            <div className="border border-white p-6 m-5 rounded-lg flex justify-evenly gap-10">
-                                <div className="w-1/3">
-                                    <Label htmlFor="user-search" className="mb-2">Name</Label>
-                                    <Input
-                                        id="user-search"
-                                        type="text"
-                                        placeholder="Search name"
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
-                                        className="border p-2 rounded-lg w-full mb-4"
-                                    />
+                        <>
+                            <div className="p-6">
+                                <h2 className="text-2xl font-bold mb-4">Users</h2>
+                                <div className="border border-white p-6 m-5 rounded-lg flex justify-evenly gap-10">
+                                    <div className="w-1/3">
+                                        <Label htmlFor="user-search" className="mb-2">Name</Label>
+                                        <Input
+                                            id="user-search"
+                                            type="text"
+                                            placeholder="Search name"
+                                            value={name}
+                                            onChange={(e) => setName(e.target.value)}
+                                            className="border p-2 rounded-lg w-full mb-4"
+                                        />
+                                    </div>
+
+                                    <div className="w-1/3">
+                                        <Label htmlFor="user-email-search" className="mb-2">Email</Label>
+                                        <Input
+                                            id="user-email-search"
+                                            type="text"
+                                            placeholder="Search email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            className="border p-2 rounded-lg w-full mb-4"
+                                        />
+                                    </div>
+
+                                    <div className="w-1/3">
+                                        <Label htmlFor="user-address-search" className="mb-2">Address</Label>
+                                        <Input
+                                            id="user-address-search"
+                                            type="text"
+                                            placeholder="Search address"
+                                            value={address}
+                                            onChange={(e) => setAddress(e.target.value)}
+                                            className="border p-2 rounded-lg w-full mb-4"
+                                        />
+                                    </div>
+
+                                    <div className="w-1/4">
+                                        <Label htmlFor="user-role-search" className="mb-2">Role</Label>
+                                        <Select value={role} onValueChange={setRole}>
+                                            <SelectTrigger className="w-[180px] mb-4">
+                                                <SelectValue placeholder="Select Role" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="any">Any</SelectItem>
+                                                <SelectItem value="admin">System Administrator</SelectItem>
+                                                <SelectItem value="user">Normal User</SelectItem>
+                                                <SelectItem value="store-owner">Store Owner</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
                                 </div>
 
-                                <div className="w-1/3">
-                                    <Label htmlFor="user-email-search" className="mb-2">Email</Label>
-                                    <Input
-                                        id="user-email-search"
-                                        type="text"
-                                        placeholder="Search email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        className="border p-2 rounded-lg w-full mb-4"
-                                    />
-                                </div>
-
-                                <div className="w-1/3">
-                                    <Label htmlFor="user-address-search" className="mb-2">Address</Label>
-                                    <Input
-                                        id="user-address-search"
-                                        type="text"
-                                        placeholder="Search address"
-                                        value={address}
-                                        onChange={(e) => setAddress(e.target.value)}
-                                        className="border p-2 rounded-lg w-full mb-4"
-                                    />
-                                </div>
-
-                                <div className="w-1/4">
-                                    <Label htmlFor="user-role-search" className="mb-2">Role</Label>
-                                    <Select value={role} onValueChange={setRole}>
-                                        <SelectTrigger className="w-[180px] mb-4">
-                                            <SelectValue placeholder="Select Role" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="any">Any</SelectItem>
-                                            <SelectItem value="admin">System Administrator</SelectItem>
-                                            <SelectItem value="user">Normal User</SelectItem>
-                                            <SelectItem value="store-owner">Store Owner</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            </div>
-
-                            <div className="border border-zinc-700 rounded-lg mt-10 overflow-hidden m-4">
-                                <div className="max-h-80 overflow-y-auto">
-                                    <table className="w-full border-collapse">
-                                        <thead className="bg-zinc-800 text-white sticky top-0 z-10">
-                                            <tr>
-                                                <th className="px-4 py-3 text-center text-sm font-semibold">User</th>
-                                                <th className="px-4 py-3 text-center text-sm font-semibold">Email</th>
-                                                <th className="px-4 py-3 text-center text-sm font-semibold">Address</th>
-                                                <th className="px-4 py-3 text-center text-sm font-semibold">Role</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-zinc-700">
-                                            {filteredUsers.map((user) => (
-                                                <tr key={user.id} className="hover:bg-zinc-800/60 transition-colors" onClick={() => { 
-                                                    setDrawer(true)
-                                                    setSelectedUser(user)
-                                                }}>
-                                                    <td className="px-4 py-3 text-center text-gray-200">{user.userName}</td>
-                                                    <td className="px-4 py-3 text-center text-gray-200">{user.email}</td>
-                                                    <td className="px-4 py-3 text-center text-gray-200">{user.address}</td>
-                                                    <td className="px-4 py-3 text-center font-medium text-white">{user.roleLabel}</td>
-                                                </tr>
-                                            ))}
-                                            {filteredUsers.length === 0 && (
+                                <div className="border border-zinc-700 rounded-lg mt-10 overflow-hidden m-4">
+                                    <div className="max-h-80 overflow-y-auto">
+                                        <table className="w-full border-collapse">
+                                            <thead className="bg-zinc-800 text-white sticky top-0 z-10">
                                                 <tr>
-                                                    <td colSpan={4} className="px-4 py-6 text-center text-gray-400">
-                                                        No users found
-                                                    </td>
+                                                    <th className="px-4 py-3 text-center text-sm font-semibold">User</th>
+                                                    <th className="px-4 py-3 text-center text-sm font-semibold">Email</th>
+                                                    <th className="px-4 py-3 text-center text-sm font-semibold">Address</th>
+                                                    <th className="px-4 py-3 text-center text-sm font-semibold">Role</th>
                                                 </tr>
-                                            )}
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody className="divide-y divide-zinc-700">
+                                                {filteredUsers.map((user) => (
+                                                    <tr key={user.id} className="hover:bg-zinc-800/60 transition-colors" onClick={() => {
+                                                        setDrawer(true)
+                                                        setSelectedUser(user)
+                                                    }}>
+                                                        <td className="px-4 py-3 text-center text-gray-200">{user.userName}</td>
+                                                        <td className="px-4 py-3 text-center text-gray-200">{user.email}</td>
+                                                        <td className="px-4 py-3 text-center text-gray-200">{user.address}</td>
+                                                        <td className="px-4 py-3 text-center font-medium text-white">{user.roleLabel}</td>
+                                                    </tr>
+                                                ))}
+                                                {filteredUsers.length === 0 && (
+                                                    <tr>
+                                                        <td colSpan={4} className="px-4 py-6 text-center text-gray-400">
+                                                            No users found
+                                                        </td>
+                                                    </tr>
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
-                            {drawer && <DrawerDemo show={drawer} onClose={() => {setDrawer(false); setSelectedUser([]);}} data={selectedUser} />}
-                        </div>
+                            {drawer && <DrawerDemo show={drawer} onClose={() => { setDrawer(false); setSelectedUser([]); }} data={selectedUser} />}
+                        </>
                     )} {activeSection === "Stores" && (
                         <div className="p-6">
                             <h2 className="text-2xl font-bold mb-4">Stores</h2>
@@ -388,7 +390,7 @@ export default function AdminPage() {
                                                     <td className="px-4 py-3 text-center text-gray-200">{store.owner}</td>
                                                     <td className="px-4 py-3 text-center text-gray-200">{store.address}</td>
                                                     <td className="px-4 py-3 text-center text-gray-200">{store.rating}</td>
-                                                    
+
                                                 </tr>
                                             ))}
                                             {filteredStores.length === 0 && (

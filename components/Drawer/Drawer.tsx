@@ -17,7 +17,7 @@ type DrawerDemoProps = {
 }
 
 export default function DrawerDemo({ show, onClose, data }: DrawerDemoProps) {
-    console.log(data)
+    console.log("show:", show)
     const [goal, setGoal] = React.useState(350)
 
     function onClick(adjustment: number) {
@@ -31,7 +31,7 @@ export default function DrawerDemo({ show, onClose, data }: DrawerDemoProps) {
             defaultOpen
             onOpenChange={(open) => {
                 if (!open && onClose) {
-                    onClose() // ✅ notify parent when closed
+                    onClose()
                 }
             }}
         >
