@@ -13,7 +13,6 @@ export async function GET(req: Request) {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET)
-    console.log("✅ Token is valid:", decoded)
     return NextResponse.json({ success: true, user: decoded })
   } catch (err) {
     return NextResponse.json({ success: false, message: "Invalid token" }, { status: 401 })

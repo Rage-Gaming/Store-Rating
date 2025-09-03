@@ -11,7 +11,7 @@ export async function POST(req: Request) {
 
         const userDetails = await db.query('SELECT id, username, email, address, role, roleLabel FROM users');
 
-        const storeDetails = await db.query('SELECT id, name, ownerEmail, address, rating from stores');
+        const storeDetails = await db.query('SELECT id, name, ownerEmail, address, overAllRating, noOfRating FROM stores');
 
         return NextResponse.json({ success: true, data: { userCount: rows[0].total_users, storeCount: storesRows[0].total_stores, userDetails, storeDetails } });
     } catch (error) {

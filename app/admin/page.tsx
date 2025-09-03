@@ -25,8 +25,15 @@ type StoreType = {
     name: string;
     ownerEmail: string;
     address: string;
-    rating: number;
+    overAllRating: number;
+    noOfRating: number;
 };
+
+const roleOptions = {
+    admin: "System Administrator",
+    user: "Normal User",
+    owner: "Store Owner",
+} as const;
 
 export default function AdminPage() {
 
@@ -48,7 +55,8 @@ export default function AdminPage() {
         email: "",
         address: "",
         password: "",
-        role: ""
+        role: "",
+        roleLabel: ""
     });
 
     const [usersData, setUsersData] = useState<UserType[]>([]);
@@ -69,27 +77,36 @@ export default function AdminPage() {
     useEffect(() => {
         if (role !== "admin") {
             redirect('/login');
+            return;
         }
 
         const fetchDashBoardData = async () => {
-            const res = await fetch('/api/dashBoardData', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-            const data = await res.json();
-            if (data.success) {
-                setUserCount(data.data.userCount);
-                setStoreCount(data.data.storeCount);
-                setUsersData(data.data.userDetails[0]);
-                setStoreData(data.data.storeDetails[0]);
-                console.log(data.data.storeDetails[0])
+            try {
+                const res = await fetch('/api/dashBoardData', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                });
+                const data = await res.json();
+                if (data.success) {
+                    setUserCount(data.data.userCount);
+                    setStoreCount(data.data.storeCount);
+                    setUsersData(data.data.userDetails[0]);
+                    setStoreData(data.data.storeDetails[0]);
+                    console.log(data.data.storeDetails[0]);
+                }
+            } catch (error) {
+                console.error("Error fetching dashboard data:", error);
+                if (error instanceof Error) {
+                    console.log("Failed to fetch dashboard data", error.message);
+                } else {
+                    console.log("Failed to fetch dashboard data", error);
+                }
             }
         };
 
-        fetchDashBoardData()
-    }, []);
+        fetchDashBoardData();
+    }, [role]);
+
 
     const handleAddUser = async (e: React.FormEvent<HTMLFormElement>) => {
         setLoading(true);
@@ -113,7 +130,8 @@ export default function AdminPage() {
                 email: "",
                 address: "",
                 password: "",
-                role: ""
+                role: "",
+                roleLabel: ""
             });
             setAddUserError("");
             setAddUserSuccess("User added successfully");
@@ -128,8 +146,10 @@ export default function AdminPage() {
 
     const handleAddStore = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setLoading(true);
         if (!newStore.name || !newStore.ownerEmail || !newStore.address) {
             setAddStoreError("Please fill in all fields");
+            setLoading(false);
             return;
         }
         const res = await fetch('/api/addStore', {
@@ -155,6 +175,7 @@ export default function AdminPage() {
         } else {
             setAddStoreError(data.message || "Failed to add store");
         }
+        setLoading(false);
     };
 
     const filteredUsers = usersData.filter((user) => {
@@ -292,7 +313,13 @@ export default function AdminPage() {
                                         />
 
                                         <Select
-                                            onValueChange={(value) => setNewUser({ ...newUser, role: value })}
+                                            onValueChange={(value) =>
+                                                setNewUser({
+                                                    ...newUser,
+                                                    role: value,
+                                                    roleLabel: roleOptions[value as keyof typeof roleOptions],
+                                                })
+                                            }
                                         >
                                             <SelectTrigger className="w-full mb-4">
                                                 <SelectValue placeholder="Select Role" />
@@ -508,7 +535,7 @@ export default function AdminPage() {
                                                     <td className="px-4 py-3 text-center text-gray-200">{store.name}</td>
                                                     <td className="px-4 py-3 text-center text-gray-200">{store.ownerEmail}</td>
                                                     <td className="px-4 py-3 text-center text-gray-200">{store.address}</td>
-                                                    <td className="px-4 py-3 text-center text-gray-200">{store.rating}</td>
+                                                    <td className="px-4 py-3 text-center text-gray-200">{store.overAllRating}({store.noOfRating})</td>
 
                                                 </tr>
                                             ))}

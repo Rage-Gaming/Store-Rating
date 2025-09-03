@@ -39,7 +39,7 @@ export default function RegisterPage() {
       console.log("Registration successful:", data);
       setUsername(data.user.username);
       setRole(data.user.role);
-      redirect('/login');
+      redirect('/user');
     }
 
     if (!data.success) {
