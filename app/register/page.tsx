@@ -1,11 +1,15 @@
 'use client'
 
-import {useState} from 'react';
-import { redirect } from 'next/navigation';
+import { useState } from 'react';
+import { useRouter } from "next/navigation";
 import { useUser } from "../context/UserContext";
+import Loader from '@/components/Loader/loader';
+
 
 export default function RegisterPage() {
-  const { setUsername, setRole } = useUser();
+  const router = useRouter();
+  const { setUsername, setRole, setEmail } = useUser();
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -21,40 +25,60 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,16}$/;
+
+    if (!passwordRegex.test(formData.password)) {
+      setError("Password must be 8-16 characters, include at least one uppercase letter and one special character.");
+      return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
       return;
     }
 
-    const res = await fetch("/api/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
+    try {
+      setLoading(true);
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
-    const data = await res.json();
-    if (data.success) {
-      console.log("Registration successful:", data);
-      setUsername(data.user.username);
-      setRole(data.user.role);
-      redirect('/user');
-    }
+      const data = await res.json();
+      console.log("Registration response:", data);
 
-    if (!data.success) {
-      setError(data.error);
+      if (data.success) {
+        setUsername(data.user.username);
+        setRole(data.user.role);
+        setEmail(data.user.email);
+        router.push("/user");
+      } else {
+        setError(data.error);
+        console.error("UUTVU", data.error);
+        setLoading(false);
+      }
+    } catch (err) {
+      setError("Something went wrong. Please try again later.");
+      console.error("Registration error:", err);
+      setLoading(false);
     }
   };
 
+
   return (
     <div className="min-h-screen flex items-center justify-center">
+      {loading && <Loader show={loading} />}
       <div className="bg-zinc-800 p-8 rounded-2xl shadow-lg w-full max-w-lg">
         <h1 className="text-2xl font-bold mb-6 text-center">Register</h1>
         {error && <p className="text-red-500 text-sm my-4">{error}</p>}
         <form onSubmit={handleSubmit} className="flex flex-col space-y-2">
           <label htmlFor="username" className="text-sm font-medium">Username</label>
           <input
+            minLength={20}
+            maxLength={60}
             onChange={(e) => setFormData({ ...formData, username: e.target.value })}
             type="text"
             id="username"
@@ -73,6 +97,7 @@ export default function RegisterPage() {
           />
           <label htmlFor="address" className="text-sm font-medium">Address</label>
           <input
+            maxLength={400}
             onChange={(e) => setFormData({ ...formData, address: e.target.value })}
             type="text"
             id="address"
@@ -82,6 +107,8 @@ export default function RegisterPage() {
           />
           <label htmlFor="password" className="text-sm font-medium">Password</label>
           <input
+            minLength={6}
+            maxLength={16}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             type="password"
             id="password"

@@ -73,6 +73,7 @@ export default function AdminPage() {
 
     const [userCount, setUserCount] = useState(0);
     const [storeCount, setStoreCount] = useState(0);
+    const [submittedRating, setSubmittedRating] = useState(0);
 
     useEffect(() => {
         if (role !== "admin") {
@@ -82,6 +83,7 @@ export default function AdminPage() {
 
         const fetchDashBoardData = async () => {
             try {
+                setLoading(true);
                 const res = await fetch('/api/dashBoardData', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -92,15 +94,17 @@ export default function AdminPage() {
                     setStoreCount(data.data.storeCount);
                     setUsersData(data.data.userDetails[0]);
                     setStoreData(data.data.storeDetails[0]);
-                    console.log(data.data.storeDetails[0]);
+                    setSubmittedRating(data.data.submittedRating);
                 }
+                setLoading(false);
             } catch (error) {
                 console.error("Error fetching dashboard data:", error);
                 if (error instanceof Error) {
-                    console.log("Failed to fetch dashboard data", error.message);
+                    console.error("Failed to fetch dashboard data", error.message);
                 } else {
-                    console.log("Failed to fetch dashboard data", error);
+                    console.error("Failed to fetch dashboard data", error);
                 }
+                setLoading(false);
             }
         };
 
@@ -240,7 +244,7 @@ export default function AdminPage() {
 
                                 <div className="p-6 bg-zinc-900 rounded-lg shadow-sm border">
                                     <h2 className="text-xl font-bold mb-8">Submitted Ratings</h2>
-                                    <h1 className="mt-2 text-gray-400 font-extrabold text-3xl">12</h1>
+                                    <h1 className="mt-2 text-gray-400 font-extrabold text-3xl">{submittedRating}</h1>
                                 </div>
                             </div>
 

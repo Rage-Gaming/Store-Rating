@@ -57,9 +57,9 @@ export default function OwnersPage() {
             } catch (error) {
                 console.error("Error fetching dashboard data:", error);
                 if (error instanceof Error) {
-                    console.log("Failed to fetch dashboard data", error.message);
+                    console.error("Failed to fetch dashboard data", error.message);
                 } else {
-                    console.log("Failed to fetch dashboard data", error);
+                    console.error("Failed to fetch dashboard data", error);
                 }
             }
         };

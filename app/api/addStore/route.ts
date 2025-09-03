@@ -5,7 +5,6 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { name, ownerEmail, address } = body;
-    console.log(name, ownerEmail, address)
     if (!name || !ownerEmail || !address) {
       return new NextResponse(JSON.stringify({ success: false, message: "Invalid store data" }), { status: 400 });
     }

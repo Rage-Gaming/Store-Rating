@@ -7,7 +7,5 @@ export async function POST(req: Request) {
     const [stores] = await db.query('SELECT * FROM stores WHERE ownerEmail = ?', [email]);
     const [ratings] = await db.query('SELECT * FROM ratings WHERE storeOwnerEmail = ?', [email]);
 
-    console.log(stores)
-
     return NextResponse.json({ success: true, data: { stores, ratings } });
 }

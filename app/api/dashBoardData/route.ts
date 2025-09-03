@@ -13,7 +13,10 @@ export async function POST(req: Request) {
 
         const storeDetails = await db.query('SELECT id, name, ownerEmail, address, overAllRating, noOfRating FROM stores');
 
-        return NextResponse.json({ success: true, data: { userCount: rows[0].total_users, storeCount: storesRows[0].total_stores, userDetails, storeDetails } });
+        const submittedRatingResult = await db.query('SELECT COUNT(*) AS total_submitted_ratings FROM ratings');
+        const submittedRatingRows = submittedRatingResult[0] as { total_submitted_ratings: number }[];
+
+        return NextResponse.json({ success: true, data: { userCount: rows[0].total_users, storeCount: storesRows[0].total_stores, userDetails, storeDetails, submittedRating: submittedRatingRows[0].total_submitted_ratings } });
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
         return new NextResponse(JSON.stringify({ success: false, message: errorMessage }), { status: 500 });

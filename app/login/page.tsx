@@ -16,6 +16,7 @@ export default function LoginPage() {
   useEffect(() => {
     async function checkUser() {
       try {
+        setLoading(true);
         const res = await fetch("/api/checkToken", {
           method: "GET",
           credentials: "include",
@@ -23,7 +24,6 @@ export default function LoginPage() {
 
         const data = await res.json()
         if (data.success) {
-          console.log(data.user.username);
           setUsername(data.user.username);
           setRole(data.user.role);
           setEmail(data.user.email);
@@ -35,8 +35,10 @@ export default function LoginPage() {
             router.push("/user");
           }
         }
+        setLoading(false);
       } catch (err) {
         console.error("Not logged in:", err)
+        setLoading(false);
       }
     }
 
@@ -71,8 +73,9 @@ export default function LoginPage() {
     }
 
     if (!data.success) {
+      console.log(data);
       setLoading(false);
-      setError(data.error);
+      setError(data.message);
     }
   };
 
@@ -80,7 +83,7 @@ export default function LoginPage() {
 
     <div className="min-h-screen flex items-center justify-center">
       {loading && <Loader show={loading} size={40} color="black" />}
-      <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-sm text-black">
+      <div className="bg-zinc-900 p-8 rounded-2xl shadow-lg w-full max-w-sm">
         <h1 className="text-2xl font-bold mb-6 text-center">Login</h1>
         {error && <p className="text-red-500 text-sm my-4">{error}</p>}
         <form className="flex flex-col space-y-4" onSubmit={handleSubmit}>
@@ -100,12 +103,12 @@ export default function LoginPage() {
           />
           <button
             type="submit"
-            className="bg-blue-800 py-2 rounded-lg text-white hover:bg-blue-900 transition cursor-pointer"
+            className="bg-white py-2 rounded-lg text-black hover:bg-blue-400 transition cursor-pointer"
           >
             Login
           </button>
         </form>
-        <h6 className="mt-4">Don't have an account? <a href="/register" className="text-blue-600 hover:underline mt-2">Register</a></h6>
+        <h6 className="mt-4">Don't have an account? <a href="/register" className="text-blue-400 hover:underline mt-2">Register</a></h6>
       </div>
     </div>
   )

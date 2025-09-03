@@ -36,7 +36,6 @@ export default function UserPage() {
         const data = await res.json();
         if (data.success) {
             setStores(data.data);
-            console.log("Fetched stores:", data.data);
         }
         setLoader(false);
     };

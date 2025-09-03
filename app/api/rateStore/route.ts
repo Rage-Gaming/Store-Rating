@@ -43,7 +43,6 @@ export async function POST(req: Request) {
       [storeId]
     ) as [Array<{ ownerEmail: string; name: string }>, any];
 
-    console.log("Store details:", storeDetailsRows[0].ownerEmail, storeDetailsRows[0].name);
 
     await db.query(
       "INSERT INTO ratings (storeId, rating, userMail, userName, storeOwnerEmail, storeName) VALUES (?, ?, ?, ?, ?, ?)",
