@@ -4,7 +4,8 @@ import Navbar from "../../components/NavBar/NavBar";
 import { Star, StarHalf } from "lucide-react";
 import { useUser } from "../context/UserContext";
 import { useState, useEffect } from "react";
-import { redirect } from "next/dist/client/components/navigation"
+import { redirect } from 'next/navigation';
+import Loader from "@/components/Loader/loader";
 
 type StoreType = {
     id: number;
@@ -27,6 +28,7 @@ export default function OwnersPage() {
     const { username, role, email } = useUser();
     const [storeData, setStoreData] = useState<StoreType[]>([]);
     const [ratingData, setRatingData] = useState<RatingType[]>([]);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (role !== "owner") {
@@ -35,6 +37,7 @@ export default function OwnersPage() {
 
         const fetchDashBoardData = async () => {
             try {
+                setLoading(true);
                 const res = await fetch('/api/storeOwnerDashboard', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -45,7 +48,9 @@ export default function OwnersPage() {
                     setStoreData(data.data.stores);
                     setRatingData(data.data.ratings);
                 }
+                setLoading(false);
             } catch (error) {
+                setLoading(false);
                 console.error("Error fetching dashboard data:", error);
                 if (error instanceof Error) {
                     console.error("Failed to fetch dashboard data", error.message);
@@ -60,6 +65,7 @@ export default function OwnersPage() {
 
     return (
         <div className="min-h-screen bg-black text-white">
+            {loading && <Loader show={loading} />}
             <Navbar name={username} title="Store Owner" />
 
             <div className="mx-21">

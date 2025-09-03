@@ -17,11 +17,15 @@ export async function POST(req: Request) {
     }
 
     if (user.role !== "owner") {
-        return new NextResponse(JSON.stringify({ success: false, message: "User with this email is not an owner, please create a store with an owner account role" }), { status: 403 });
+      return new NextResponse(JSON.stringify({ success: false, message: "User with this email is not an owner, please create a store with an owner account role" }), { status: 403 });
     }
 
-
     await db.query("INSERT INTO stores (name, ownerEmail, address) VALUES (?, ?, ?)", [name, ownerEmail, address]);
+
+    await db.query(
+      "UPDATE users SET stores = JSON_ARRAY_APPEND(COALESCE(stores, JSON_ARRAY()), '$', ?) WHERE email = ?",
+      [name, ownerEmail]
+    );
 
     return new NextResponse(JSON.stringify({ success: true }), { status: 201 });
 

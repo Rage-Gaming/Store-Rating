@@ -18,8 +18,6 @@ type DrawerDemoProps = {
 
 export default function DrawerDemo({ show, onClose, data }: DrawerDemoProps) {
 
-    if (!show) return null
-
     return (
         <Drawer
             defaultOpen
@@ -43,7 +41,11 @@ export default function DrawerDemo({ show, onClose, data }: DrawerDemoProps) {
                         <h1>Email : {data.email}</h1>
                         <h1>Address : {data.address}</h1>
                         <h1>Role : {data.roleLabel}</h1>
-                        {data.rating && <h1>Rating : {data.rating}</h1>}
+                        {data.stores && (
+                            <h1>
+                                Stores : {JSON.parse(data.stores).join(", ")}
+                            </h1>
+                        )}
 
                     </div>
 

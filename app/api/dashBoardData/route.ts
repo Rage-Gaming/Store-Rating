@@ -9,7 +9,7 @@ export async function POST(req: Request) {
         const storesCountResult = await db.query('SELECT COUNT(*) AS total_stores FROM stores');
         const storesRows = storesCountResult[0] as { total_stores: number }[];
 
-        const userDetails = await db.query('SELECT id, username, email, address, role, roleLabel FROM users');
+        const userDetails = await db.query('SELECT id, username, email, address, role, roleLabel, stores FROM users');
 
         const storeDetails = await db.query('SELECT id, name, ownerEmail, address, overAllRating, noOfRating FROM stores');
 

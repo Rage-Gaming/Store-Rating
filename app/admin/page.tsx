@@ -182,6 +182,8 @@ export default function AdminPage() {
         setLoading(false);
     };
 
+    console.log(usersData)
+
     const filteredUsers = usersData.filter((user) => {
         return (
             user.username.toLowerCase().includes(name.toLowerCase()) &&
