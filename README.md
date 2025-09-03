@@ -107,28 +107,28 @@ JWT_SECRET =
 
 ## 📸 Screenshots
 * Login Page
-![ERD Diagram](./docs/Images/Login.png)
+![ERD Diagram](./Docs/Images/Login.png)
 
 * Register Page
-  ![ERD Diagram](./docs/Images/Register.png)
+  ![ERD Diagram](./Docs/Images/Register.png)
 
 * Admin Dashboar
-  ![ERD Diagram](./docs/Images/AdminDashboard.png)
+  ![ERD Diagram](./Docs/Images/AdminDashboard.png)
 
 * Admin Store View
-  ![ERD Diagram](./docs/Images/AdminStoreView.png)
+  ![ERD Diagram](./Docs/Images/AdminStoreView.png)
 
 * Admin User View
-  ![ERD Diagram](./docs/Images/AdminUserView.png)
+  ![ERD Diagram](./Docs/Images/AdminUserView.png)
 
 * Shop Owner
- ![ERD Diagram](./docs/Images/Owner.png)
+ ![ERD Diagram](./Docs/Images/Owner.png)
 
  * User Details 
- ![ERD Diagram](./docs/Images/UserDetailspng.png)
+ ![ERD Diagram](./Docs/Images/UserDetailspng.png)
 
  * User Rating 
- ![ERD Diagram](./docs/Images/UserRating.png)
+ ![ERD Diagram](./Docs/Images/UserRating.png)
 
 ---
 
