@@ -2,10 +2,11 @@
 
 import DropdownMenuComponent from "@/components/Dropdown/dropdown";
 import DialogInputBox from "@/components/Dialog/dialogInputBox";
-import { useState } from "react";
-import { redirect } from 'next/navigation';
+import { useUser } from "@/app/context/UserContext";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { redirect } from 'next/navigation';
+import { useState } from "react";
 
 type NavBarProps = {
     name: string | null;
@@ -18,17 +19,40 @@ export default function Navbar({ name, title }: NavBarProps) {
     const [currentPassword, setCurrentPassword] = useState<string>("");
     const [newPassword, setNewPassword] = useState<string>("");
     const [repeatNewPassword, setRepeatNewPassword] = useState<string>("");
+    const { email } = useUser();
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!currentPassword || !newPassword || !repeatNewPassword) {
             setError("All fields are required");
-            return;
+            return false;
         }
         if (newPassword !== repeatNewPassword) {
             setError("Passwords do not match");
-            return;
+            return false;
+        }
+
+        const response = await fetch("/api/update-password", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                email,
+                currentPassword,
+                newPassword,
+            }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            setError(errorData.message || "Failed to update password");
+            return false;
         }
         setError(null);
+        setCurrentPassword("");
+        setNewPassword("");
+        setRepeatNewPassword("");
+        return true;
     };
 
     return (
@@ -48,7 +72,7 @@ export default function Navbar({ name, title }: NavBarProps) {
                         onSelect: async () => {
                             await fetch("/api/logout", {
                                 method: "POST",
-                                credentials: "include", // include cookies
+                                credentials: "include",
                             });
                             redirect('/login')
                         },
@@ -60,23 +84,41 @@ export default function Navbar({ name, title }: NavBarProps) {
                 onOpenChange={setOpenDialog}
                 title="Update Password"
                 description="This will update your account password."
-                onSave={() => handleSave()}
+                onSave={handleSave}
             >
-                {error && <h1 className="text-[#e40202]">{error}</h1>}
-                <div className="grid gap-3">
-                    <Label htmlFor="name" defaultValue={currentPassword}>Current Password</Label>
-                    <Input placeholder="Enter current password" id="name" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
-                </div>
-                <div className="grid gap-3">
-                    <Label htmlFor="username" defaultValue={newPassword}>New Password</Label>
-                    <Input placeholder="Enter new password" id="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
-                </div>
-                <div className="grid gap-3">
-                    <Label htmlFor="username" defaultValue={repeatNewPassword}>Repeat New Password</Label>
-                    <Input placeholder="Repeat new password" id="password_repeat" value={repeatNewPassword} onChange={(e) => setRepeatNewPassword(e.target.value)} />
+                {error && <h1 className="text-[#e40202] ">{error}</h1>}
+
+                <div className="grid gap-3 mt-2">
+                    <Label htmlFor="current-password">Current Password</Label>
+                    <Input
+                        placeholder="Enter current password"
+                        id="current-password"
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                    />
                 </div>
 
+                <div className="grid gap-3 mt-2">
+                    <Label htmlFor="new-password">New Password</Label>
+                    <Input
+                        placeholder="Enter new password"
+                        id="new-password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                    />
+                </div>
+
+                <div className="grid gap-3 mt-2">
+                    <Label htmlFor="repeat-password">Repeat New Password</Label>
+                    <Input
+                        placeholder="Repeat new password"
+                        id="repeat-password"
+                        value={repeatNewPassword}
+                        onChange={(e) => setRepeatNewPassword(e.target.value)}
+                    />
+                </div>
             </DialogInputBox>
+
         </div>
     )
 }

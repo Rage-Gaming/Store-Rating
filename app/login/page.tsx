@@ -8,9 +8,8 @@ import { useUser } from "../context/UserContext";
 
 export default function LoginPage() {
   const router = useRouter()
-  const { setUsername, setRole } = useUser();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const { setUsername, setRole, setEmail } = useUser();
+  const [credentials, setCredentials] = useState({ email: "", password: "" });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -24,9 +23,10 @@ export default function LoginPage() {
 
         const data = await res.json()
         if (data.success) {
-          console.log(data)
-          setUsername(data.user.name);
+          console.log(data.user.username);
+          setUsername(data.user.username);
           setRole(data.user.role);
+          setEmail(data.user.email);
           if (data.user.role === "admin") {
             router.push("/admin");
           } else if (data.user.role === "owner") {
@@ -52,11 +52,14 @@ export default function LoginPage() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify(credentials),
     });
 
     const data = await res.json();
     if (data.success) {
+      setUsername(data.user.username);
+      setRole(data.user.role);
+      setEmail(data.user.email);
       setLoading(false);
       if (data.user.role === "admin") {
         redirect("/admin");
@@ -82,14 +85,14 @@ export default function LoginPage() {
         {error && <p className="text-red-500 text-sm my-4">{error}</p>}
         <form className="flex flex-col space-y-4" onSubmit={handleSubmit}>
           <input
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => setCredentials({ ...credentials, email: e.target.value })}
             type="email"
             placeholder="Email"
             required
             className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
           <input
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
             type="password"
             placeholder="Password"
             required

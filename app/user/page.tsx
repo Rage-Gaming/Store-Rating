@@ -33,7 +33,7 @@ export default function UserPage() {
         if (!username) {
             redirect('/login');
         }
-    }, [username]);
+    }, []);
 
     const handleTempRating = (storeId: number, rating: number) => {
         setStores((prev) =>

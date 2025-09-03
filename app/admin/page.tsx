@@ -116,7 +116,7 @@ export default function AdminPage() {
     const [newUser, setNewUser] = useState({
         username: "",
         email: "",
-        address: "",
+        address:"",
         password: "",
         role: ""
     });
@@ -154,7 +154,7 @@ export default function AdminPage() {
     return (
         <div className="min-h-screen flex flex-col">
             {/* <div className="bg-red-600 text-white"> */}
-            <Navbar name="Rage" title="System Administrator" />
+            <Navbar name="Rage" title="System Administrator"/>
             {/* </div> */}
 
             <div className="flex flex-1">

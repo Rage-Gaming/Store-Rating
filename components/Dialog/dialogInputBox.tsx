@@ -1,24 +1,21 @@
-"use client"
-
-import { ReactNode } from "react"
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 type DialogInputBoxProps = {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  title: string
-  description?: string
-  children: ReactNode
-  onSave?: () => void
-}
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+  onSave: () => Promise<boolean> | boolean; // must return success/failure
+};
 
 export default function DialogInputBox({
   open,
@@ -28,30 +25,30 @@ export default function DialogInputBox({
   children,
   onSave,
 }: DialogInputBoxProps) {
+  const handleSaveClick = async () => {
+    const success = await onSave();
+    if (success) {
+      onOpenChange(false); // ✅ manually close if save worked
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
 
-        <div className="grid gap-4">{children}</div>
+        <div className="py-4">{children}</div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button
-            onClick={() => {
-              onSave?.()
-              onOpenChange(false)
-            }}
-          >
-            Save
-          </Button>
+          <Button onClick={handleSaveClick}>Save</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
