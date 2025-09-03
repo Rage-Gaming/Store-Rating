@@ -1,16 +1,47 @@
 'use client'
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { redirect } from 'next/navigation';
+import { useRouter } from "next/navigation"
+import Loader from "@/components/Loader/loader";
 
 export default function LoginPage() {
+  const router = useRouter()
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    async function checkUser() {
+      try {
+        const res = await fetch("/api/checkToken", {
+          method: "GET",
+          credentials: "include",
+        })
+
+        const data = await res.json()
+        if (data.success) {
+          if (data.user.role === "admin") {
+            router.push("/admin");
+          } else if (data.user.role === "owner") {
+            router.push("/owner");
+          } else {
+            router.push("/user");
+          }
+        }
+      } catch (err) {
+        console.error("❌ Not logged in:", err)
+      }
+    }
+
+    checkUser()
+  }, [router])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
 
     const res = await fetch("/api/login", {
       method: "POST",
@@ -22,16 +53,26 @@ export default function LoginPage() {
 
     const data = await res.json();
     if (data.success) {
-      redirect("/user");
+      setLoading(false);
+      if (data.user.role === "admin") {
+        redirect("/admin");
+      } else if (data.user.role === "owner") {
+        redirect("/owner");
+      } else {
+        redirect("/user");
+      }
     }
 
     if (!data.success) {
+      setLoading(false);
       setError(data.error);
     }
   };
 
   return (
+
     <div className="min-h-screen flex items-center justify-center">
+      {loading && <Loader show={loading} size={40} color="black" />}
       <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-sm text-black">
         <h1 className="text-2xl font-bold mb-6 text-center">Login</h1>
         {error && <p className="text-red-500 text-sm my-4">{error}</p>}

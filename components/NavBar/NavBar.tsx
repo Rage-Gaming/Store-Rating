@@ -31,7 +31,7 @@ export default function Navbar({ name, title }: NavBarProps) {
         setError(null);
     };
 
-    return(
+    return (
         <div className="h-20 bg-zinc-900 flex items-center justify-between shadow-md px-21">
             <h1 className="text-white text-3xl text-center font-bold">{title}</h1>
             <DropdownMenuComponent
@@ -45,7 +45,11 @@ export default function Navbar({ name, title }: NavBarProps) {
                     },
                     {
                         label: "Logout",
-                        onSelect: () => {
+                        onSelect: async () => {
+                            await fetch("/api/logout", {
+                                method: "POST",
+                                credentials: "include", // include cookies
+                            });
                             redirect('/login')
                         },
                     },
