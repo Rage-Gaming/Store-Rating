@@ -65,7 +65,7 @@ export default function UserPage() {
         await fetch("/api/rateStore", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ storeId, rating: store.tempRating, email }),
+            body: JSON.stringify({ storeId, rating: store.tempRating, email, user: username }),
         });
         setLoader(false);
 

@@ -3,10 +3,10 @@ import { db } from "@/lib/db";
 
 export async function POST(req: Request) {
   try {
-    const { storeId, rating, email } = await req.json();
+    const { storeId, rating, email, user } = await req.json();
 
-    if (!storeId || !rating || !email) {
-      return NextResponse.json({ success: false, message: "Store ID, rating, and email required" });
+    if (!storeId || !rating || !email || !user) {
+      return NextResponse.json({ success: false, message: "Store ID, rating, email, and user required" });
     }
 
     // Check if already rated
@@ -38,9 +38,16 @@ export async function POST(req: Request) {
       [newSum, newCount, newOverall, storeId]
     );
 
+    const [storeDetailsRows] = await db.query(
+      "SELECT ownerEmail, name FROM stores WHERE id = ?",
+      [storeId]
+    ) as [Array<{ ownerEmail: string; name: string }>, any];
+
+    console.log("Store details:", storeDetailsRows[0].ownerEmail, storeDetailsRows[0].name);
+
     await db.query(
-      "INSERT INTO ratings (storeId, rating, userMail) VALUES (?, ?, ?)",
-      [storeId, rating, email]
+      "INSERT INTO ratings (storeId, rating, userMail, userName, storeOwnerEmail, storeName) VALUES (?, ?, ?, ?, ?, ?)",
+      [storeId, rating, email, user, storeDetailsRows[0].ownerEmail, storeDetailsRows[0].name]
     );
 
     return NextResponse.json({ success: true });
