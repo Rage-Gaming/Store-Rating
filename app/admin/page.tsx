@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { redirect } from 'next/navigation';
+import { ChevronUp, ChevronDown } from "lucide-react";
 
 type UserType = {
     id: number;
@@ -202,6 +203,75 @@ export default function AdminPage() {
     });
 
     const menuItems = ["Dashboard", "Users", "Stores"];
+
+
+    const [userSortConfig, setUserSortConfig] = useState<{ key: keyof typeof filteredUsers[0]; direction: "asc" | "desc" } | null>(null);
+    const [storeSortConfig, setStoreSortConfig] = useState<{ key: keyof typeof filteredStores[0]; direction: "asc" | "desc" } | null>(null);
+
+
+    const sortedUsers = [...filteredUsers].sort((a, b) => {
+        if (!userSortConfig) return 0;
+        const { key, direction } = userSortConfig;
+        const order = direction === "asc" ? 1 : -1;
+
+        if (typeof a[key] === "string" && typeof b[key] === "string") {
+            return (a[key] as string).localeCompare(b[key] as string) * order;
+        }
+        if (typeof a[key] === "number" && typeof b[key] === "number") {
+            return ((a[key] as number) - (b[key] as number)) * order;
+        }
+        return 0;
+    });
+
+    const handleUserSort = (key: keyof typeof filteredUsers[0]) => {
+        setUserSortConfig((prev) =>
+            prev && prev.key === key
+                ? { key, direction: prev.direction === "asc" ? "desc" : "asc" }
+                : { key, direction: "asc" }
+        );
+    };
+
+    const renderUserSortIcon = (key: keyof typeof filteredUsers[0]) => {
+        if (!userSortConfig || userSortConfig.key !== key) return null;
+        return userSortConfig.direction === "asc" ? (
+            <ChevronUp className="inline w-4 h-4 ml-1" />
+        ) : (
+            <ChevronDown className="inline w-4 h-4 ml-1" />
+        );
+    };
+
+
+    const sortedStores = [...filteredStores].sort((a, b) => {
+        if (!storeSortConfig) return 0;
+        const { key, direction } = storeSortConfig;
+        const order = direction === "asc" ? 1 : -1;
+
+        if (typeof a[key] === "string" && typeof b[key] === "string") {
+            return (a[key] as string).localeCompare(b[key] as string) * order;
+        }
+        if (typeof a[key] === "number" && typeof b[key] === "number") {
+            return ((a[key] as number) - (b[key] as number)) * order;
+        }
+        return 0;
+    });
+
+    const handleStoreSort = (key: keyof typeof filteredStores[0]) => {
+        setStoreSortConfig((prev) =>
+            prev && prev.key === key
+                ? { key, direction: prev.direction === "asc" ? "desc" : "asc" }
+                : { key, direction: "asc" }
+        );
+    };
+
+    const renderStoreSortIcon = (key: keyof typeof filteredStores[0]) => {
+        if (!storeSortConfig || storeSortConfig.key !== key) return null;
+        return storeSortConfig.direction === "asc" ? (
+            <ChevronUp className="inline w-4 h-4 ml-1" />
+        ) : (
+            <ChevronDown className="inline w-4 h-4 ml-1" />
+        );
+    };
+
 
     return (
         <div className="min-h-screen flex flex-col">
@@ -449,25 +519,49 @@ export default function AdminPage() {
                                         <table className="w-full border-collapse">
                                             <thead className="bg-zinc-800 text-white sticky top-0 z-10">
                                                 <tr>
-                                                    <th className="px-4 py-3 text-center text-sm font-semibold">User</th>
-                                                    <th className="px-4 py-3 text-center text-sm font-semibold">Email</th>
-                                                    <th className="px-4 py-3 text-center text-sm font-semibold">Address</th>
-                                                    <th className="px-4 py-3 text-center text-sm font-semibold">Role</th>
+                                                    <th
+                                                        onClick={() => handleUserSort("username")}
+                                                        className="px-4 py-3 text-center text-sm font-semibold cursor-pointer select-none"
+                                                    >
+                                                        User {renderUserSortIcon("username")}
+                                                    </th>
+                                                    <th
+                                                        onClick={() => handleUserSort("email")}
+                                                        className="px-4 py-3 text-center text-sm font-semibold cursor-pointer select-none"
+                                                    >
+                                                        Email {renderUserSortIcon("email")}
+                                                    </th>
+                                                    <th
+                                                        onClick={() => handleUserSort("address")}
+                                                        className="px-4 py-3 text-center text-sm font-semibold cursor-pointer select-none"
+                                                    >
+                                                        Address {renderUserSortIcon("address")}
+                                                    </th>
+                                                    <th
+                                                        onClick={() => handleUserSort("roleLabel")}
+                                                        className="px-4 py-3 text-center text-sm font-semibold cursor-pointer select-none"
+                                                    >
+                                                        Role {renderUserSortIcon("roleLabel")}
+                                                    </th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-zinc-700">
-                                                {filteredUsers.map((user) => (
-                                                    <tr key={user.id} className="hover:bg-zinc-800/60 transition-colors" onClick={() => {
-                                                        setDrawer(true)
-                                                        setSelectedUser(user)
-                                                    }}>
+                                                {sortedUsers.map((user) => (
+                                                    <tr
+                                                        key={user.id}
+                                                        className="hover:bg-zinc-800/60 transition-colors"
+                                                        onClick={() => {
+                                                            setDrawer(true);
+                                                            setSelectedUser(user);
+                                                        }}
+                                                    >
                                                         <td className="px-4 py-3 text-center text-gray-200">{user.username}</td>
                                                         <td className="px-4 py-3 text-center text-gray-200">{user.email}</td>
                                                         <td className="px-4 py-3 text-center text-gray-200">{user.address}</td>
                                                         <td className="px-4 py-3 text-center font-medium text-white">{user.roleLabel}</td>
                                                     </tr>
                                                 ))}
-                                                {filteredUsers.length === 0 && (
+                                                {sortedUsers.length === 0 && (
                                                     <tr>
                                                         <td colSpan={4} className="px-4 py-6 text-center text-gray-400">
                                                             No users found
@@ -529,23 +623,44 @@ export default function AdminPage() {
                                     <table className="w-full border-collapse">
                                         <thead className="bg-zinc-800 text-white sticky top-0 z-10">
                                             <tr>
-                                                <th className="px-4 py-3 text-center text-sm font-semibold">Name</th>
-                                                <th className="px-4 py-3 text-center text-sm font-semibold">Email</th>
-                                                <th className="px-4 py-3 text-center text-sm font-semibold">Address</th>
-                                                <th className="px-4 py-3 text-center text-sm font-semibold">Rating</th>
+                                                <th
+                                                    onClick={() => handleStoreSort("name")}
+                                                    className="px-4 py-3 text-center text-sm font-semibold cursor-pointer select-none"
+                                                >
+                                                    Name {renderStoreSortIcon("name")}
+                                                </th>
+                                                <th
+                                                    onClick={() => handleStoreSort("ownerEmail")}
+                                                    className="px-4 py-3 text-center text-sm font-semibold cursor-pointer select-none"
+                                                >
+                                                    Email {renderStoreSortIcon("ownerEmail")}
+                                                </th>
+                                                <th
+                                                    onClick={() => handleStoreSort("address")}
+                                                    className="px-4 py-3 text-center text-sm font-semibold cursor-pointer select-none"
+                                                >
+                                                    Address {renderStoreSortIcon("address")}
+                                                </th>
+                                                <th
+                                                    onClick={() => handleStoreSort("overAllRating")}
+                                                    className="px-4 py-3 text-center text-sm font-semibold cursor-pointer select-none"
+                                                >
+                                                    Rating {renderStoreSortIcon("overAllRating")}
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-zinc-700">
-                                            {filteredStores.map((store) => (
+                                            {sortedStores.map((store) => (
                                                 <tr key={store.id} className="hover:bg-zinc-800/60 transition-colors">
                                                     <td className="px-4 py-3 text-center text-gray-200">{store.name}</td>
                                                     <td className="px-4 py-3 text-center text-gray-200">{store.ownerEmail}</td>
                                                     <td className="px-4 py-3 text-center text-gray-200">{store.address}</td>
-                                                    <td className="px-4 py-3 text-center text-gray-200">{store.overAllRating}({store.noOfRating})</td>
-
+                                                    <td className="px-4 py-3 text-center text-gray-200">
+                                                        {store.overAllRating} ({store.noOfRating})
+                                                    </td>
                                                 </tr>
                                             ))}
-                                            {filteredStores.length === 0 && (
+                                            {sortedStores.length === 0 && (
                                                 <tr>
                                                     <td colSpan={4} className="px-4 py-6 text-center text-gray-400">
                                                         No stores found
@@ -554,6 +669,7 @@ export default function AdminPage() {
                                             )}
                                         </tbody>
                                     </table>
+
                                 </div>
                             </div>
                         </div>

@@ -1,7 +1,7 @@
 'use client'
 
 import Navbar from "../../components/NavBar/NavBar";
-import { Star, StarHalf } from "lucide-react";
+import { Star, StarHalf, ChevronUp, ChevronDown } from "lucide-react";
 import { useUser } from "../context/UserContext";
 import { useState, useEffect } from "react";
 import { redirect } from 'next/navigation';
@@ -29,6 +29,40 @@ export default function OwnersPage() {
     const [storeData, setStoreData] = useState<StoreType[]>([]);
     const [ratingData, setRatingData] = useState<RatingType[]>([]);
     const [loading, setLoading] = useState(false);
+
+    // 🔹 Added sorting state
+    const [sortConfig, setSortConfig] = useState<{ key: keyof RatingType; direction: "asc" | "desc" } | null>(null);
+
+    const sortedRatings = [...ratingData].sort((a, b) => {
+        if (!sortConfig) return 0;
+        const { key, direction } = sortConfig;
+        const order = direction === "asc" ? 1 : -1;
+
+        if (typeof a[key] === "string" && typeof b[key] === "string") {
+            return (a[key] as string).localeCompare(b[key] as string) * order;
+        }
+        if (typeof a[key] === "number" && typeof b[key] === "number") {
+            return ((a[key] as number) - (b[key] as number)) * order;
+        }
+        return 0;
+    });
+
+    const handleSort = (key: keyof RatingType) => {
+        setSortConfig((prev) =>
+            prev && prev.key === key
+                ? { key, direction: prev.direction === "asc" ? "desc" : "asc" }
+                : { key, direction: "asc" }
+        );
+    };
+
+    const renderSortIcon = (key: keyof RatingType) => {
+        if (!sortConfig || sortConfig.key !== key) return null;
+        return sortConfig.direction === "asc" ? (
+            <ChevronUp className="inline w-4 h-4 ml-1" />
+        ) : (
+            <ChevronDown className="inline w-4 h-4 ml-1" />
+        );
+    };
 
     useEffect(() => {
         if (role !== "owner") {
@@ -72,8 +106,6 @@ export default function OwnersPage() {
                 <h1 className="text-white text-2xl font-bold">Dashboard</h1>
                 <p className="text-gray-400">No of stores : {storeData.length}</p>
 
-
-
                 <div className="w-full max-h-[300px] rounded-lg mt-6 p-4 overflow-y-auto">
                     <div className="grid grid-cols-4 gap-5">
                         {storeData.map((store) => (
@@ -89,7 +121,7 @@ export default function OwnersPage() {
                                         const full = i < Math.floor(store.overAllRating);
                                         const half =
                                             i === Math.floor(store.overAllRating) &&
-                                            store.overAllRating % 1 >= 0.1; // show half star if decimal part ≥ 0.1
+                                            store.overAllRating % 1 >= 0.1;
 
                                         return full ? (
                                             <Star key={i} size={18} className="text-zinc-200 fill-zinc-200" />
@@ -106,7 +138,6 @@ export default function OwnersPage() {
                     </div>
                 </div>
 
-
                 <div className="w-full mt-6 p-4">
                     <h1 className="text-white text-2xl font-bold">
                         Users who rated your stores
@@ -117,13 +148,28 @@ export default function OwnersPage() {
                             <table className="w-full border-collapse">
                                 <thead className="bg-zinc-800 text-white sticky top-0 z-10">
                                     <tr>
-                                        <th className="px-4 py-3 text-center text-sm font-semibold">User</th>
-                                        <th className="px-4 py-3 text-center text-sm font-semibold">Store</th>
-                                        <th className="px-4 py-3 text-center text-sm font-semibold">Rating</th>
+                                        <th
+                                            onClick={() => handleSort("userName")}
+                                            className="px-4 py-3 text-center text-sm font-semibold cursor-pointer select-none"
+                                        >
+                                            User {renderSortIcon("userName")}
+                                        </th>
+                                        <th
+                                            onClick={() => handleSort("storeName")}
+                                            className="px-4 py-3 text-center text-sm font-semibold cursor-pointer select-none"
+                                        >
+                                            Store {renderSortIcon("storeName")}
+                                        </th>
+                                        <th
+                                            onClick={() => handleSort("rating")}
+                                            className="px-4 py-3 text-center text-sm font-semibold cursor-pointer select-none"
+                                        >
+                                            Rating {renderSortIcon("rating")}
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-zinc-700">
-                                    {ratingData.map((rating) => (
+                                    {sortedRatings.map((rating) => (
                                         <tr key={rating.id} className="hover:bg-zinc-800/60 transition-colors">
                                             <td className="px-4 py-3 text-center text-gray-200">{rating.userName}</td>
                                             <td className="px-4 py-3 text-center text-gray-200">{rating.storeName}</td>
@@ -136,9 +182,7 @@ export default function OwnersPage() {
                     </div>
                 </div>
 
-
             </div>
         </div>
-
     );
 }
