@@ -1,12 +1,15 @@
 'use client'
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import DrawerDemo from "../../components/Drawer/Drawer";
+import Loader from "../../components/Loader/loader";
 import Navbar from "../../components/NavBar/NavBar";
+import { useUser } from "../context/UserContext";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import DrawerDemo from "../../components/Drawer/Drawer";
+import { useState, useEffect } from "react";
+import { redirect } from 'next/navigation';
 
 const mockUsersData = [
     {
@@ -105,39 +108,77 @@ const mockStoreData = [
 ]
 
 export default function AdminPage() {
+
+    const { username, role } = useUser();
+
     const [activeSection, setActiveSection] = useState("Dashboard");
 
     const [name, setName] = useState("");
+    const [addUserError, setAddUserError] = useState("");
+    const [addUserSuccess, setAddUserSuccess] = useState("");
     const [email, setEmail] = useState("");
     const [address, setAddress] = useState("");
-    const [role, setRole] = useState("any");
+    const [formRole, setFormRole] = useState("any");
     const [drawer, setDrawer] = useState(false);
     const [selectedUser, setSelectedUser] = useState({});
+    const [loading, setLoading] = useState(false);
     const [newUser, setNewUser] = useState({
         username: "",
         email: "",
-        address:"",
+        address: "",
         password: "",
         role: ""
     });
 
+    useEffect(() => {
+        if (role !== "admin") {
+            redirect('/login');
+        }
+        
+    }, []);
+
     const handleAddUser = async (e: React.FormEvent<HTMLFormElement>) => {
+        setLoading(true);
         e.preventDefault();
-        await fetch('/api/register', {
+        if (!newUser.username || !newUser.email || !newUser.address || !newUser.password || !newUser.role) {
+            setAddUserError("Please fill in all fields");
+            setLoading(false);
+            return;
+        }
+        const res = await fetch('/api/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(newUser),
         });
-    };
+        const data = await res.json();
+        if (data.success) {
+            // User added successfully
+            setNewUser({
+                username: "",
+                email: "",
+                address: "",
+                password: "",
+                role: ""
+            });
+            setAddUserError("");
+            setAddUserSuccess("User added successfully");
+            setTimeout(() => {
+                setAddUserSuccess("");
+            }, 5000);
+        } else {
+            setAddUserError(data.message || "Failed to add user");
+        }
+        setLoading(false);
+    }
 
     const filteredUsers = mockUsersData.filter((user) => {
         return (
             user.userName.toLowerCase().includes(name.toLowerCase()) &&
             user.email.toLowerCase().includes(email.toLowerCase()) &&
             user.address.toLowerCase().includes(address.toLowerCase()) &&
-            (role === "any" || user.role.toLowerCase() === role)
+            (formRole === "any" || user.role.toLowerCase() === formRole)
         );
     });
 
@@ -154,8 +195,10 @@ export default function AdminPage() {
     return (
         <div className="min-h-screen flex flex-col">
             {/* <div className="bg-red-600 text-white"> */}
-            <Navbar name="Rage" title="System Administrator"/>
+            <Navbar name={username} title="System Administrator" />
             {/* </div> */}
+
+            {loading && <Loader show={loading} size={40} color="white" />}
 
             <div className="flex flex-1">
                 <aside className="w-64 bg-black border-r">
@@ -207,6 +250,8 @@ export default function AdminPage() {
                                 {/* Add User */}
                                 <div className="border p-5 rounded-lg border-[#d6d5d58e]">
                                     <h3 className="text-center font-bold text-lg">Add User</h3>
+                                    {addUserError && <p className="text-red-500 text-sm my-4">{addUserError}</p>}
+                                    {addUserSuccess && <p className="text-green-500 text-sm my-4">{addUserSuccess}</p>}
                                     <form className="mt-4" onSubmit={handleAddUser}>
                                         <Label htmlFor="user-name" className="mb-2">
                                             Name
@@ -215,6 +260,7 @@ export default function AdminPage() {
                                             onChange={(e) =>
                                                 setNewUser({ ...newUser, username: e.target.value })
                                             }
+                                            value={newUser.username}
                                             id="user-name"
                                             type="text"
                                             placeholder="Enter user name"
@@ -226,6 +272,7 @@ export default function AdminPage() {
                                         </Label>
                                         <Input
                                             onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                                            value={newUser.email}
                                             id="user-email"
                                             type="text"
                                             placeholder="Enter your email"
@@ -239,6 +286,7 @@ export default function AdminPage() {
                                             onChange={(e) =>
                                                 setNewUser({ ...newUser, password: e.target.value })
                                             }
+                                            value={newUser.password}
                                             id="user-password"
                                             type="password"
                                             placeholder="Enter your password"
@@ -252,6 +300,7 @@ export default function AdminPage() {
                                             onChange={(e) =>
                                                 setNewUser({ ...newUser, address: e.target.value })
                                             }
+                                            value={newUser.address}
                                             id="user-address"
                                             type="text"
                                             placeholder="Enter your address"
@@ -362,7 +411,7 @@ export default function AdminPage() {
 
                                     <div className="w-1/4">
                                         <Label htmlFor="user-role-search" className="mb-2">Role</Label>
-                                        <Select value={role} onValueChange={setRole}>
+                                        <Select value={formRole} onValueChange={setFormRole}>
                                             <SelectTrigger className="w-[180px] mb-4">
                                                 <SelectValue placeholder="Select Role" />
                                             </SelectTrigger>
