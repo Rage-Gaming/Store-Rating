@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server"
 import bcrypt from "bcrypt"
 import { db } from "@/lib/db"
+import jwt from "jsonwebtoken"
+
+const JWT_SECRET = process.env.JWT_SECRET || "store_rating_jwt_secret@2211"
 
 
 export async function POST(req: Request) {
@@ -25,14 +28,30 @@ export async function POST(req: Request) {
       );
     }
 
-
-
     await db.query(
       "INSERT INTO users (username, email, address, password, role, roleLabel) VALUES (?, ?, ?, ?, ?, ?)",
       [username, email, address, hashedPassword, role, roleLabel]
     )
 
-    return NextResponse.json({ success: true, message: "User created", user: { username, role, email } })
+    const [user] = await db.query(
+      "SELECT id FROM users WHERE email = ?",
+      [email]
+    ) as [Array<{ id: number }>, any];
+
+    console.log(user[0].id)
+
+    const token = jwt.sign({ id: user[0].id, username, email, role }, JWT_SECRET, {
+      expiresIn: "7d",
+    })
+
+    const res = NextResponse.json({ success: true, message: "User created", user: { username, role, email } })
+    res.cookies.set("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+    });
+    return res;
   } catch (err) {
     console.error("Signup error:", err)
     return NextResponse.json({ success: false, error: "Internal Server Error" }, { status: 500 })
