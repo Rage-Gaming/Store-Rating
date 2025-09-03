@@ -125,7 +125,7 @@ export default function AdminPage() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(newUser),
+            body: JSON.stringify({ ...newUser, fromAdmin: true }),
         });
         const data = await res.json();
         if (data.success) {
@@ -273,7 +273,7 @@ export default function AdminPage() {
                                             id="user-name"
                                             type="text"
                                             placeholder="Enter user name"
-                                            className="border p-2 rounded-lg w-full mb-4"
+                                            className="border p-2 rounded-lg w-full mb-4 selection:bg-red-900 selection:text-white"
                                         />
 
                                         <Label htmlFor="user-email" className="mb-2">
@@ -285,7 +285,7 @@ export default function AdminPage() {
                                             id="user-email"
                                             type="text"
                                             placeholder="Enter your email"
-                                            className="border p-2 rounded-lg w-full mb-4"
+                                            className="border p-2 rounded-lg w-full mb-4 selection:bg-red-900 selection:text-white"
                                         />
 
                                         <Label htmlFor="user-password" className="mb-2">
@@ -299,7 +299,7 @@ export default function AdminPage() {
                                             id="user-password"
                                             type="password"
                                             placeholder="Enter your password"
-                                            className="border p-2 rounded-lg w-full mb-4"
+                                            className="border p-2 rounded-lg w-full mb-4 selection:bg-red-900 selection:text-white"
                                         />
 
                                         <Label htmlFor="user-address" className="mb-2">
@@ -313,7 +313,7 @@ export default function AdminPage() {
                                             id="user-address"
                                             type="text"
                                             placeholder="Enter your address"
-                                            className="border p-2 rounded-lg w-full mb-4"
+                                            className="border p-2 rounded-lg w-full mb-4 selection:bg-red-900 selection:text-white"
                                         />
 
                                         <Select
@@ -354,7 +354,7 @@ export default function AdminPage() {
                                             id="store-name"
                                             type="text"
                                             placeholder="Enter store name"
-                                            className="border p-2 rounded-lg w-full mb-4"
+                                            className="border p-2 rounded-lg w-full mb-4 selection:bg-red-900 selection:text-white"
                                         />
 
                                         <Label htmlFor="store-email" className="mb-2">Owner Email</Label>
@@ -364,7 +364,7 @@ export default function AdminPage() {
                                             id="store-email"
                                             type="text"
                                             placeholder="Enter your email"
-                                            className="border p-2 rounded-lg w-full mb-4"
+                                            className="border p-2 rounded-lg w-full mb-4 selection:bg-red-900 selection:text-white"
                                         />
 
                                         <Label htmlFor="store-address" className="mb-2">Store Address</Label>
@@ -374,7 +374,7 @@ export default function AdminPage() {
                                             id="store-address"
                                             type="text"
                                             placeholder="Enter your address"
-                                            className="border p-2 rounded-lg w-full mb-4"
+                                            className="border p-2 rounded-lg w-full mb-4 selection:bg-red-900 selection:text-white"
                                         />
 
                                         <Button variant="outline" className="w-full">

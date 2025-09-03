@@ -6,15 +6,6 @@ import { useUser } from "../context/UserContext";
 import { useState, useEffect } from "react";
 import { redirect } from "next/dist/client/components/navigation"
 
-// const mockStoreRatingData = [
-//     {
-//         id: 1,
-//         storeName: "My Store",
-//         userName: "User 1",
-//         rating: 5
-//     }
-// ]
-
 type StoreType = {
     id: number;
     name: string;

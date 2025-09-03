@@ -9,9 +9,9 @@ const JWT_SECRET = process.env.JWT_SECRET || "store_rating_jwt_secret@2211"
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    const { username, email, address, password, role, roleLabel } = body
+    const { username, email, address, password, role, roleLabel, fromAdmin } = body
     if (!username || !email || !address || !password || !role || !roleLabel) {
-      return NextResponse.json({ success: false, error: "All fields are required" }, { status: 400 })
+      return NextResponse.json({ success: false, message: "All fields are required" }, { status: 400 })
     }
 
     const hashedPassword = await bcrypt.hash(password, 10)
@@ -23,7 +23,7 @@ export async function POST(req: Request) {
 
     if (existingUserRows.length > 0) {
       return NextResponse.json(
-        { success: false, error: "User with this email already exists" },
+        { success: false, message: "User with this email already exists" },
         { status: 400 }
       );
     }
@@ -38,20 +38,22 @@ export async function POST(req: Request) {
       [email]
     ) as [Array<{ id: number }>, any];
 
-    console.log(user[0].id)
+    if (!fromAdmin) {
+      const token = jwt.sign({ id: user[0].id, username, email, role }, JWT_SECRET, {
+        expiresIn: "7d",
+      })
 
-    const token = jwt.sign({ id: user[0].id, username, email, role }, JWT_SECRET, {
-      expiresIn: "7d",
-    })
+      const res = NextResponse.json({ success: true, message: "User created", user: { username, role, email } })
+      res.cookies.set("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+      });
+      return res;
+    }
 
-    const res = NextResponse.json({ success: true, message: "User created", user: { username, role, email } })
-    res.cookies.set("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-    });
-    return res;
+    return NextResponse.json({ success: true, message: "User created", user: { username, role, email } })
   } catch (err) {
     console.error("Signup error:", err)
     return NextResponse.json({ success: false, error: "Internal Server Error" }, { status: 500 })

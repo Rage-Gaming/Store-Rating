@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     }
 
     if (user.role !== "owner") {
-        return new NextResponse(JSON.stringify({ success: false, message: "User is not an owner" }), { status: 403 });
+        return new NextResponse(JSON.stringify({ success: false, message: "User with this email is not an owner, please create a store with an owner account role" }), { status: 403 });
     }
 
 

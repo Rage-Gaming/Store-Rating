@@ -44,7 +44,7 @@ export default function RegisterPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, fromAdmin: false }),
       });
 
       const data = await res.json();
