@@ -74,7 +74,7 @@ cd store-rating
 
 ### 2. Download SQL and Insert
 
-* [Download schema.sql](https://github.com/Rage-Gaming/Store-Ratingraw/main/Docs/schema.sql)
+* [Download schema.sql](https://github.com/Rage-Gaming/Store-Rating/blob/master/Docs/schema.sql)
 
 
 ### 3. Clone the repository
