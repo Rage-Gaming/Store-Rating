@@ -11,7 +11,9 @@ export async function POST(req: Request) {
 
         const userDetails = await db.query('SELECT id, username, email, address, role, roleLabel FROM users');
 
-        return NextResponse.json({ success: true, data: { userCount: rows[0].total_users, storeCount: storesRows[0].total_stores, userDetails } });
+        const storeDetails = await db.query('SELECT id, name, ownerEmail, address, rating from stores');
+
+        return NextResponse.json({ success: true, data: { userCount: rows[0].total_users, storeCount: storesRows[0].total_stores, userDetails, storeDetails } });
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
         return new NextResponse(JSON.stringify({ success: false, message: errorMessage }), { status: 500 });

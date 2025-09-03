@@ -17,12 +17,6 @@ type DrawerDemoProps = {
 }
 
 export default function DrawerDemo({ show, onClose, data }: DrawerDemoProps) {
-    console.log("show:", show)
-    const [goal, setGoal] = React.useState(350)
-
-    function onClick(adjustment: number) {
-        setGoal(Math.max(200, Math.min(400, goal + adjustment)))
-    }
 
     if (!show) return null
 

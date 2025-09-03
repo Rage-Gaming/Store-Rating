@@ -11,51 +11,6 @@ import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { redirect } from 'next/navigation';
 
-const mockStoreData = [
-    {
-        id: 1,
-        name: "Store A",
-        owner: "John Doe",
-        address: "123 Main St",
-        rating: 4.5
-    },
-    {
-        id: 2,
-        name: "Store B",
-        owner: "Jane Smith",
-        address: "456 Elm St",
-        rating: 4.0
-    },
-    {
-        id: 3,
-        name: "Store C",
-        owner: "Alice Johnson",
-        address: "789 Oak St",
-        rating: 3.5
-    },
-    {
-        id: 4,
-        name: "Store D",
-        owner: "Bob Brown",
-        address: "123 Pine St",
-        rating: 4.2
-    },
-    {
-        id: 5,
-        name: "Store E",
-        owner: "Charlie Green",
-        address: "456 Elm St",
-        rating: 4.8
-    },
-    {
-        id: 6,
-        name: "Store F",
-        owner: "David Wilson",
-        address: "789 Oak St",
-        rating: 3.9
-    }
-]
-
 type UserType = {
     id: number;
     username: string;
@@ -63,6 +18,14 @@ type UserType = {
     address: string;
     role: string;
     roleLabel: string;
+};
+
+type StoreType = {
+    id: number;
+    name: string;
+    ownerEmail: string;
+    address: string;
+    rating: number;
 };
 
 export default function AdminPage() {
@@ -89,6 +52,8 @@ export default function AdminPage() {
     });
 
     const [usersData, setUsersData] = useState<UserType[]>([]);
+    const [storeData, setStoreData] = useState<StoreType[]>([]);
+
     const [addStoreError, setAddStoreError] = useState("");
     const [addStoreSuccess, setAddStoreSuccess] = useState("");
     const [newStore, setNewStore] = useState({
@@ -118,7 +83,8 @@ export default function AdminPage() {
                 setUserCount(data.data.userCount);
                 setStoreCount(data.data.storeCount);
                 setUsersData(data.data.userDetails[0]);
-                console.log(data.data.userDetails[0])
+                setStoreData(data.data.storeDetails[0]);
+                console.log(data.data.storeDetails[0])
             }
         };
 
@@ -200,10 +166,10 @@ export default function AdminPage() {
         );
     });
 
-    const filteredStores = mockStoreData.filter((store) => {
+    const filteredStores = storeData.filter((store) => {
         return (
             store.name.toLowerCase().includes(name.toLowerCase()) &&
-            store.owner.toLowerCase().includes(email.toLowerCase()) &&
+            store.ownerEmail.toLowerCase().includes(email.toLowerCase()) &&
             store.address.toLowerCase().includes(address.toLowerCase())
         );
     });
@@ -540,7 +506,7 @@ export default function AdminPage() {
                                             {filteredStores.map((store) => (
                                                 <tr key={store.id} className="hover:bg-zinc-800/60 transition-colors">
                                                     <td className="px-4 py-3 text-center text-gray-200">{store.name}</td>
-                                                    <td className="px-4 py-3 text-center text-gray-200">{store.owner}</td>
+                                                    <td className="px-4 py-3 text-center text-gray-200">{store.ownerEmail}</td>
                                                     <td className="px-4 py-3 text-center text-gray-200">{store.address}</td>
                                                     <td className="px-4 py-3 text-center text-gray-200">{store.rating}</td>
 

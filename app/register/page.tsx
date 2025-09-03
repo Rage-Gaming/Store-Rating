@@ -13,6 +13,7 @@ export default function RegisterPage() {
     role: 'user',
     password: '',
     confirmPassword: '',
+    roleLabel: 'Normal User'
   });
 
   const [error, setError] = useState<string | null>(null);
@@ -35,8 +36,8 @@ export default function RegisterPage() {
 
     const data = await res.json();
     if (data.success) {
-      // Handle successful registration (e.g., redirect to login)
-      setUsername(data.user.name);
+      console.log("Registration successful:", data);
+      setUsername(data.user.username);
       setRole(data.user.role);
       redirect('/login');
     }

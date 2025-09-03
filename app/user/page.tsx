@@ -1,77 +1,98 @@
-'use client'
+"use client";
 
-import Navbar from "@/components/NavBar/NavBar"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { useState, useEffect } from "react"
-import { Star } from "lucide-react"
+import Navbar from "@/components/NavBar/NavBar";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
+import { Star } from "lucide-react";
 import { useUser } from "../context/UserContext";
-import { redirect } from "next/dist/client/components/navigation"
+import { useRouter } from "next/navigation";
+import Loader from "@/components/Loader/loader";
 
 type Store = {
-    id: number
-    name: string
-    address: string
-    overallRating: number
-    userRating?: number
-    tempRating?: number
-}
-
-const mockStores: Store[] = [
-    { id: 1, name: "White Oak Market", address: "1200 Oak St, Springfield", overallRating: 3.7, userRating: 1 },
-    { id: 2, name: "Blackstone Grocers", address: "88 River Ave, Westfield", overallRating: 3.0 },
-    { id: 3, name: "Monochrome Deli", address: "42 Center Rd, Lakeview", overallRating: 4.8 },
-    { id: 4, name: "Noir & Blanc Coffee", address: "9 3rd St, Midtown", overallRating: 4.4 },
-]
+    id: number;
+    name: string;
+    address: string;
+    overallRating: number;
+    userRating?: number;
+    tempRating?: number;
+    noOfRating?: number;
+};
 
 export default function UserPage() {
-    const { username } = useUser();
-    const [stores, setStores] = useState(mockStores)
-    const [search, setSearch] = useState("")
+    const { username, email } = useUser();
+    const [stores, setStores] = useState<Store[]>([]);
+    const [search, setSearch] = useState("");
+    const router = useRouter();
+    const [loader, setLoader] = useState(false);
+
+    const fetchStores = async () => {
+        setLoader(true);
+        const res = await fetch("/api/getAllStore", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email }),
+        });
+        const data = await res.json();
+        if (data.success) {
+            setStores(data.data);
+            console.log("Fetched stores:", data.data);
+        }
+        setLoader(false);
+    };
 
     useEffect(() => {
         if (!username) {
-            redirect('/login');
+            router.push("/login");
+            return;
         }
-    }, []);
+        fetchStores();
+    }, [username, router, email]);
 
     const handleTempRating = (storeId: number, rating: number) => {
         setStores((prev) =>
-            prev.map((store) =>
-                store.id === storeId ? { ...store, tempRating: rating } : store
+            prev.map((s) =>
+                s.id === storeId ? { ...s, tempRating: rating } : s
             )
-        )
-    }
+        );
+    };
 
-    const handleSubmit = (storeId: number) => {
-        setStores((prev) =>
-            prev.map((store) =>
-                store.id === storeId
-                    ? { ...store, userRating: store.tempRating, tempRating: undefined }
-                    : store
-            )
-        )
-    }
+    const handleSubmit = async (storeId: number) => {
+        const store = stores.find((s) => s.id === storeId);
+        if (!store || store.tempRating === undefined) return;
+        setLoader(true);
 
-    const handleClear = (storeId: number) => {
-        setStores((prev) =>
-            prev.map((store) =>
-                store.id === storeId
-                    ? { ...store, userRating: undefined, tempRating: undefined }
-                    : store
-            )
-        )
-    }
+        await fetch("/api/rateStore", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ storeId, rating: store.tempRating, email }),
+        });
+        setLoader(false);
+
+        fetchStores();
+    };
+
+    const handleClear = async (storeId: number) => {
+        await fetch("/api/clearRating", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ storeId, email }),
+        });
+
+        fetchStores();
+    };
 
     const filteredStores = stores.filter(
         (store) =>
             store.name.toLowerCase().includes(search.toLowerCase()) ||
             store.address.toLowerCase().includes(search.toLowerCase())
-    )
+    );
 
     return (
         <div className="min-h-screen bg-black text-white">
             <Navbar name={username} title="User Page" />
+
+            {loader && <Loader show={loader} />}
 
             <div className="max-w-3xl mx-auto px-6 py-8">
                 <h1 className="text-2xl font-bold">Stores</h1>
@@ -102,7 +123,10 @@ export default function UserPage() {
                                     {[1, 2, 3, 4, 5].map((star) => (
                                         <button
                                             key={star}
-                                            onClick={() => handleTempRating(store.id, star)}
+                                            onClick={() =>
+                                                !store.userRating && handleTempRating(store.id, star)
+                                            }
+                                            disabled={!!store.userRating}
                                             className="focus:outline-none"
                                         >
                                             <Star
@@ -114,17 +138,13 @@ export default function UserPage() {
                                         </button>
                                     ))}
 
-                                    {store.tempRating !== undefined && (
-                                        <Button
-                                            size="sm"
-                                            variant="default"
-                                            onClick={() => handleSubmit(store.id)}
-                                        >
+                                    {store.tempRating !== undefined && !store.userRating && (
+                                        <Button size="sm" onClick={() => handleSubmit(store.id)}>
                                             Submit
                                         </Button>
                                     )}
 
-                                    {(store.userRating || store.tempRating) && (
+                                    {store.userRating && (
                                         <Button
                                             size="sm"
                                             variant="outline"
@@ -136,14 +156,14 @@ export default function UserPage() {
                                 </div>
 
                                 <p className="text-sm text-gray-400 mt-1">
-                                    {store.userRating ? "Modify your rating" : "Submit a rating"}
+                                    {store.userRating ? "You already rated" : "Submit a rating"}
                                 </p>
                             </div>
 
                             <div className="text-right">
                                 <p className="text-sm">
                                     Overall Rating:{" "}
-                                    <span className="font-bold">{store.overallRating}/5</span>
+                                    <span className="font-bold">{store.overallRating} ({store.noOfRating})</span>
                                 </p>
                                 <p className="text-sm text-gray-400">
                                     Your Rating: {store.userRating ?? "—"}
@@ -158,5 +178,5 @@ export default function UserPage() {
                 </div>
             </div>
         </div>
-    )
+    );
 }
