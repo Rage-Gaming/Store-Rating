@@ -45,7 +45,7 @@ export default function DrawerDemo({ show, onClose, data }: DrawerDemoProps) {
                     </DrawerHeader>
 
                     <div className="p-8 pb-0">
-                        <h1>Name : {data.userName}</h1>
+                        <h1>Name : {data.username}</h1>
                         <h1>Email : {data.email}</h1>
                         <h1>Address : {data.address}</h1>
                         <h1>Role : {data.roleLabel}</h1>

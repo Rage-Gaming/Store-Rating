@@ -11,57 +11,6 @@ import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { redirect } from 'next/navigation';
 
-const mockUsersData = [
-    {
-        id: 1,
-        userName: "John Doe",
-        email: "john@example.com",
-        address: "123 Main St",
-        role: "owner",
-        roleLabel: "Store Owner"
-    },
-    {
-        id: 2,
-        userName: "Jane Smith",
-        email: "jane@example.com",
-        address: "456 Elm St",
-        role: "user",
-        roleLabel: "Normal User"
-    },
-    {
-        id: 3,
-        userName: "Alice Johnson",
-        email: "alice@example.com",
-        address: "789 Oak St",
-        role: "admin",
-        roleLabel: "System Administrator"
-    },
-    {
-        id: 4,
-        userName: "Bob Brown",
-        email: "bob@example.com",
-        address: "123 Pine St",
-        role: "user",
-        roleLabel: "Normal User"
-    },
-    {
-        id: 5,
-        userName: "Charlie Green",
-        email: "charlie@example.com",
-        address: "456 Elm St",
-        role: "user",
-        roleLabel: "Normal User"
-    },
-    {
-        id: 6,
-        userName: "David Wilson",
-        email: "david@example.com",
-        address: "789 Oak St",
-        role: "user",
-        roleLabel: "Normal User"
-    }
-];
-
 const mockStoreData = [
     {
         id: 1,
@@ -107,6 +56,15 @@ const mockStoreData = [
     }
 ]
 
+type UserType = {
+    id: number;
+    username: string;
+    email: string;
+    address: string;
+    role: string;
+    roleLabel: string;
+};
+
 export default function AdminPage() {
 
     const { username, role } = useUser();
@@ -130,11 +88,41 @@ export default function AdminPage() {
         role: ""
     });
 
+    const [usersData, setUsersData] = useState<UserType[]>([]);
+    const [addStoreError, setAddStoreError] = useState("");
+    const [addStoreSuccess, setAddStoreSuccess] = useState("");
+    const [newStore, setNewStore] = useState({
+        name: "",
+        ownerEmail: "",
+        address: "",
+        rating: 0
+    });
+
+    const [userCount, setUserCount] = useState(0);
+    const [storeCount, setStoreCount] = useState(0);
+
     useEffect(() => {
         if (role !== "admin") {
             redirect('/login');
         }
-        
+
+        const fetchDashBoardData = async () => {
+            const res = await fetch('/api/dashBoardData', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            const data = await res.json();
+            if (data.success) {
+                setUserCount(data.data.userCount);
+                setStoreCount(data.data.storeCount);
+                setUsersData(data.data.userDetails[0]);
+                console.log(data.data.userDetails[0])
+            }
+        };
+
+        fetchDashBoardData()
     }, []);
 
     const handleAddUser = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -154,7 +142,6 @@ export default function AdminPage() {
         });
         const data = await res.json();
         if (data.success) {
-            // User added successfully
             setNewUser({
                 username: "",
                 email: "",
@@ -173,9 +160,40 @@ export default function AdminPage() {
         setLoading(false);
     }
 
-    const filteredUsers = mockUsersData.filter((user) => {
+    const handleAddStore = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (!newStore.name || !newStore.ownerEmail || !newStore.address) {
+            setAddStoreError("Please fill in all fields");
+            return;
+        }
+        const res = await fetch('/api/addStore', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newStore),
+        });
+        const data = await res.json();
+        if (data.success) {
+            setNewStore({
+                name: "",
+                ownerEmail: "",
+                address: "",
+                rating: 0
+            });
+            setAddStoreError("");
+            setAddStoreSuccess("Store added successfully");
+            setTimeout(() => {
+                setAddStoreSuccess("");
+            }, 5000);
+        } else {
+            setAddStoreError(data.message || "Failed to add store");
+        }
+    };
+
+    const filteredUsers = usersData.filter((user) => {
         return (
-            user.userName.toLowerCase().includes(name.toLowerCase()) &&
+            user.username.toLowerCase().includes(name.toLowerCase()) &&
             user.email.toLowerCase().includes(email.toLowerCase()) &&
             user.address.toLowerCase().includes(address.toLowerCase()) &&
             (formRole === "any" || user.role.toLowerCase() === formRole)
@@ -225,12 +243,12 @@ export default function AdminPage() {
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div className="p-6 bg-zinc-900 rounded-lg shadow-sm border">
                                     <h2 className="text-xl font-bold mb-8">Total Users</h2>
-                                    <h1 className="mt-2 text-gray-400 font-extrabold text-3xl">100</h1>
+                                    <h1 className="mt-2 text-gray-400 font-extrabold text-3xl">{userCount}</h1>
                                 </div>
 
                                 <div className="p-6 bg-zinc-900 rounded-lg shadow-sm border">
                                     <h2 className="text-xl font-bold mb-8">Total Stores</h2>
-                                    <h1 className="mt-2 text-gray-400 font-extrabold text-3xl">50</h1>
+                                    <h1 className="mt-2 text-gray-400 font-extrabold text-3xl">{storeCount}</h1>
                                 </div>
 
                                 <div className="p-6 bg-zinc-900 rounded-lg shadow-sm border">
@@ -329,31 +347,33 @@ export default function AdminPage() {
                                 {/* Add Store */}
                                 <div className="border p-5 rounded-lg border-[#d6d5d58e]">
                                     <h3 className="text-center font-bold text-lg">Add Store</h3>
-                                    <form className="mt-4">
-                                        <Label htmlFor="store-name" className="mb-2">
-                                            Name
-                                        </Label>
+                                    {addStoreError && <p className="text-red-500">{addStoreError}</p>}
+                                    {addStoreSuccess && <p className="text-green-500">{addStoreSuccess}</p>}
+                                    <form className="mt-4" onSubmit={handleAddStore}>
+                                        <Label htmlFor="store-name" className="mb-2">Store Name</Label>
                                         <Input
+                                            onChange={(e) => setNewStore({ ...newStore, name: e.target.value })}
+                                            value={newStore.name}
                                             id="store-name"
                                             type="text"
                                             placeholder="Enter store name"
                                             className="border p-2 rounded-lg w-full mb-4"
                                         />
 
-                                        <Label htmlFor="store-email" className="mb-2">
-                                            Email
-                                        </Label>
+                                        <Label htmlFor="store-email" className="mb-2">Owner Email</Label>
                                         <Input
+                                            onChange={(e) => setNewStore({ ...newStore, ownerEmail: e.target.value })}
+                                            value={newStore.ownerEmail}
                                             id="store-email"
                                             type="text"
                                             placeholder="Enter your email"
                                             className="border p-2 rounded-lg w-full mb-4"
                                         />
 
-                                        <Label htmlFor="store-address" className="mb-2">
-                                            Address
-                                        </Label>
+                                        <Label htmlFor="store-address" className="mb-2">Store Address</Label>
                                         <Input
+                                            onChange={(e) => setNewStore({ ...newStore, address: e.target.value })}
+                                            value={newStore.address}
                                             id="store-address"
                                             type="text"
                                             placeholder="Enter your address"
@@ -442,7 +462,7 @@ export default function AdminPage() {
                                                         setDrawer(true)
                                                         setSelectedUser(user)
                                                     }}>
-                                                        <td className="px-4 py-3 text-center text-gray-200">{user.userName}</td>
+                                                        <td className="px-4 py-3 text-center text-gray-200">{user.username}</td>
                                                         <td className="px-4 py-3 text-center text-gray-200">{user.email}</td>
                                                         <td className="px-4 py-3 text-center text-gray-200">{user.address}</td>
                                                         <td className="px-4 py-3 text-center font-medium text-white">{user.roleLabel}</td>
