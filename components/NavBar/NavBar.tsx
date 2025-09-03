@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { redirect } from 'next/navigation';
 import { useState } from "react";
+import Loader from "../Loader/loader";
 
 type NavBarProps = {
     name: string | null;
@@ -20,6 +21,7 @@ export default function Navbar({ name, title }: NavBarProps) {
     const [newPassword, setNewPassword] = useState<string>("");
     const [repeatNewPassword, setRepeatNewPassword] = useState<string>("");
     const { email } = useUser();
+    const [loading, setLoading] = useState(false);
 
     const handleSave = async () => {
         if (!currentPassword || !newPassword || !repeatNewPassword) {
@@ -57,6 +59,7 @@ export default function Navbar({ name, title }: NavBarProps) {
 
     return (
         <div className="h-20 bg-zinc-900 flex items-center justify-between shadow-md px-21">
+            {loading && <Loader show={loading} />}
             <h1 className="text-white text-3xl text-center font-bold">{title}</h1>
             <DropdownMenuComponent
                 buttonName={name ?? "User"}
@@ -70,10 +73,12 @@ export default function Navbar({ name, title }: NavBarProps) {
                     {
                         label: "Logout",
                         onSelect: async () => {
+                            setLoading(true);
                             await fetch("/api/logout", {
                                 method: "POST",
                                 credentials: "include",
                             });
+                            setLoading(false);
                             redirect('/login')
                         },
                     },

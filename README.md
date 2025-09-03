@@ -1,36 +1,154 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Full Stack Store Rating Platform
 
-## Getting Started
+This project is a **Full Stack Web Application** built as part of the **Roxiler Systems FullStack Intern Coding Challenge**.  
+It enables users to register, log in, and submit ratings for stores, with role-based access control for **System Administrators, Normal Users, and Store Owners**.
 
-First, run the development server:
+---
 
+## 🚀 Tech Stack
+
+- **Frontend:** React.js (with TailwindCSS & modern UI practices)
+- **Backend:** Node.js with Express.js
+- **Database:** MySQL
+- **Authentication:** JWT-based login system
+- **Other Tools:** REST APIs, bcrypt for password hashing
+
+---
+
+## 🔑 User Roles & Functionalities
+
+### 👑 System Administrator
+- Add new stores, normal users, and admin users.
+- Dashboard view with:
+  - Total number of users  
+  - Total number of stores  
+  - Total number of ratings  
+- Manage users with filters (Name, Email, Address, Role).
+- View user details (including store ratings if they are Store Owners).
+- Secure logout functionality.
+
+### 🙋 Normal User
+- Register with **Name, Email, Address, Password**.
+- Login & update password.
+- Browse all registered stores.
+- Search for stores by **Name** or **Address**.
+- Submit, update, and view store ratings (1–5).
+- View their own rating for each store.
+- Secure logout functionality.
+
+### 🏪 Store Owner
+- Login & update password.
+- Dashboard to view:
+  - List of users who rated their store  
+  - Average rating of their store  
+- Secure logout functionality.
+
+---
+
+## 🛡️ Form Validations
+
+- **Name:** 20–60 characters  
+- **Address:** Max 400 characters  
+- **Password:** 8–16 characters, must include at least one uppercase letter & one special character  
+- **Email:** Standard email format validation  
+
+---
+
+## 📊 Additional Features
+- Sorting support on all tables (ascending/descending).
+- Role-based access with protected routes.
+- Clean UI with responsive design.
+- Secure password storage using hashing.
+
+
+
+---
+
+## ⚙️ Installation & Setup
+
+### 1. Clone the repository
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/Rage-Gaming/Store-Rating.git
+cd store-rating
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Download SQL and Insert
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+* [Download schema.sql](https://github.com/Rage-Gaming/Store-Ratingraw/main/docs/schema.sql)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+### 3. Clone the repository
+```bash
+git clone https://github.com/Rage-Gaming/Store-Rating.git
+cd store-rating
 
-To learn more about Next.js, take a look at the following resources:
+cd backend
+pnpm install
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+#or
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+npm install
+```
 
-## Deploy on Vercel
+#### Create a .env file:
+```
+NODE_ENV =
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+MYSQL_HOST = 
+MYSQL_USER = 
+MYSQL_DATABASE = 
+MYSQL_PASSWORD =
+MYSQL_PORT = 
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+JWT_SECRET = 
+```
+
+---
+
+## 📸 Screenshots
+* Login Page
+![ERD Diagram](./docs/images/Login.png)
+
+* Register Page
+  ![ERD Diagram](./docs/images/Register.png)
+
+* Admin Dashboar
+  ![ERD Diagram](./docs/images/AdminDashboard.png)
+
+* Admin Store View
+  ![ERD Diagram](./docs/images/AdminStoreView.png)
+
+* Admin User View
+  ![ERD Diagram](./docs/images/AdminUserView.png)
+
+* Shop Owner
+ ![ERD Diagram](./docs/images/Owner.png)
+
+ * User Details 
+ ![ERD Diagram](./docs/images/UserDetailspng.png)
+
+ * User Rating 
+ ![ERD Diagram](./docs/images/UserRating.png)
+
+---
+
+## ✅ Best Practices Followed
+* Modular backend with MVC pattern.
+
+* Secure authentication & authorization.
+
+* Clean UI with TailwindCSS and reusable components.
+
+* Proper database schema normalization.
+
+* Environment variable configuration.
+
+
+
+---
+
+## 📌 Notes
+
+* This project was developed as part of the Roxiler Systems FullStack Intern Coding Challenge.
+
+* Submission includes both frontend and backend implementations with proper validations.
