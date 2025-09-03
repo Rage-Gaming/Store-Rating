@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
 type NavBarProps = {
-    name: string;
+    name: string | null;
     title: string;
 };
 
@@ -35,7 +35,7 @@ export default function Navbar({ name, title }: NavBarProps) {
         <div className="h-20 bg-zinc-900 flex items-center justify-between shadow-md px-21">
             <h1 className="text-white text-3xl text-center font-bold">{title}</h1>
             <DropdownMenuComponent
-                buttonName={name}
+                buttonName={name ?? "User"}
                 items={[
                     {
                         label: "Update password",

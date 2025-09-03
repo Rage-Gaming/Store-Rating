@@ -14,7 +14,7 @@ const mockUsersData = [
         userName: "John Doe",
         email: "john@example.com",
         address: "123 Main St",
-        role: "store-owner",
+        role: "owner",
         roleLabel: "Store Owner"
     },
     {
@@ -113,6 +113,24 @@ export default function AdminPage() {
     const [role, setRole] = useState("any");
     const [drawer, setDrawer] = useState(false);
     const [selectedUser, setSelectedUser] = useState({});
+    const [newUser, setNewUser] = useState({
+        username: "",
+        email: "",
+        address: "",
+        password: "",
+        role: ""
+    });
+
+    const handleAddUser = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        await fetch('/api/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newUser),
+        });
+    };
 
     const filteredUsers = mockUsersData.filter((user) => {
         return (
@@ -159,77 +177,148 @@ export default function AdminPage() {
 
                 <main className="flex-1 p-6 bg-black">
                     {activeSection === "Dashboard" && (
-                        <div>
-                            <div className="flex justify-between">
-
-                                <div className="p-6 bg-zinc-900 rounded-lg shadow-sm border w-1/4">
+                        <div className="p-6">
+                            {/* Top stats section */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div className="p-6 bg-zinc-900 rounded-lg shadow-sm border">
                                     <h2 className="text-xl font-bold mb-8">Total Users</h2>
                                     <h1 className="mt-2 text-gray-400 font-extrabold text-3xl">100</h1>
                                 </div>
 
-                                <div className="p-6 bg-zinc-900 rounded-lg shadow-sm border w-1/4">
+                                <div className="p-6 bg-zinc-900 rounded-lg shadow-sm border">
                                     <h2 className="text-xl font-bold mb-8">Total Stores</h2>
                                     <h1 className="mt-2 text-gray-400 font-extrabold text-3xl">50</h1>
                                 </div>
 
-                                <div className="p-6 bg-zinc-900 rounded-lg shadow-sm border w-1/4">
+                                <div className="p-6 bg-zinc-900 rounded-lg shadow-sm border">
                                     <h2 className="text-xl font-bold mb-8">Submitted Ratings</h2>
                                     <h1 className="mt-2 text-gray-400 font-extrabold text-3xl">12</h1>
                                 </div>
                             </div>
 
-                            <h1 className="text-center font-extrabold text-4xl my-10">Add Users and Stores</h1>
-                            <span className="flex left-0 bottom-0 w-full h-0.5 bg-[#c9c8c854] rounded" />
+                            {/* Heading */}
+                            <h1 className="text-center font-extrabold text-4xl my-10">
+                                Add Users and Stores
+                            </h1>
+                            <span className="block w-full h-0.5 bg-[#c9c8c854] rounded" />
 
-                            <div className="px-30 py-6 mt-10 flex justify-evenly rounded-lg">
-
-                                <div className="border w-1/3 p-5 rounded-lg border-[#d6d5d5]">
+                            {/* Forms Section */}
+                            <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-8">
+                                {/* Add User */}
+                                <div className="border p-5 rounded-lg border-[#d6d5d58e]">
                                     <h3 className="text-center font-bold text-lg">Add User</h3>
-                                    <form className="mt-4">
-                                        <Label htmlFor="user-name" className="mb-2">Name</Label>
-                                        <Input id="user-name" type="text" placeholder="Enter user name" className="border p-2 rounded-lg w-full mb-4" />
+                                    <form className="mt-4" onSubmit={handleAddUser}>
+                                        <Label htmlFor="user-name" className="mb-2">
+                                            Name
+                                        </Label>
+                                        <Input
+                                            onChange={(e) =>
+                                                setNewUser({ ...newUser, username: e.target.value })
+                                            }
+                                            id="user-name"
+                                            type="text"
+                                            placeholder="Enter user name"
+                                            className="border p-2 rounded-lg w-full mb-4"
+                                        />
 
-                                        <Label htmlFor="user-email" className="mb-2">Email</Label>
-                                        <Input id="user-email" type="text" placeholder="Enter your email" className="border p-2 rounded-lg w-full mb-4" />
+                                        <Label htmlFor="user-email" className="mb-2">
+                                            Email
+                                        </Label>
+                                        <Input
+                                            onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                                            id="user-email"
+                                            type="text"
+                                            placeholder="Enter your email"
+                                            className="border p-2 rounded-lg w-full mb-4"
+                                        />
 
-                                        <Label htmlFor="user-password" className="mb-2">Password</Label>
-                                        <Input id="user-password" type="password" placeholder="Enter your password" className="border p-2 rounded-lg w-full mb-4" />
+                                        <Label htmlFor="user-password" className="mb-2">
+                                            Password
+                                        </Label>
+                                        <Input
+                                            onChange={(e) =>
+                                                setNewUser({ ...newUser, password: e.target.value })
+                                            }
+                                            id="user-password"
+                                            type="password"
+                                            placeholder="Enter your password"
+                                            className="border p-2 rounded-lg w-full mb-4"
+                                        />
 
-                                        <Label htmlFor="user-address" className="mb-2">Address</Label>
-                                        <Input id="user-address" type="text" placeholder="Enter your address" className="border p-2 rounded-lg w-full mb-4" />
+                                        <Label htmlFor="user-address" className="mb-2">
+                                            Address
+                                        </Label>
+                                        <Input
+                                            onChange={(e) =>
+                                                setNewUser({ ...newUser, address: e.target.value })
+                                            }
+                                            id="user-address"
+                                            type="text"
+                                            placeholder="Enter your address"
+                                            className="border p-2 rounded-lg w-full mb-4"
+                                        />
 
-                                        <Select>
-                                            <SelectTrigger className="w-[180px] mb-4">
+                                        <Select
+                                            onValueChange={(value) => setNewUser({ ...newUser, role: value })}
+                                        >
+                                            <SelectTrigger className="w-full mb-4">
                                                 <SelectValue placeholder="Select Role" />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="admin">System Administrator</SelectItem>
                                                 <SelectItem value="user">Normal User</SelectItem>
-                                                <SelectItem value="store-owner">Store Owner</SelectItem>
+                                                <SelectItem value="owner">Store Owner</SelectItem>
                                             </SelectContent>
                                         </Select>
 
-                                        <Button variant="outline">Add User</Button>
+                                        <Button variant="outline" className="w-full">
+                                            Add User
+                                        </Button>
                                     </form>
                                 </div>
 
-                                <div className="border w-1/3 p-5 rounded-lg border-[#d6d5d5]">
+                                {/* Add Store */}
+                                <div className="border p-5 rounded-lg border-[#d6d5d58e]">
                                     <h3 className="text-center font-bold text-lg">Add Store</h3>
                                     <form className="mt-4">
-                                        <Label htmlFor="store-name" className="mb-2">Name</Label>
-                                        <Input id="store-name" type="text" placeholder="Enter store name" className="border p-2 rounded-lg w-full mb-4" />
+                                        <Label htmlFor="store-name" className="mb-2">
+                                            Name
+                                        </Label>
+                                        <Input
+                                            id="store-name"
+                                            type="text"
+                                            placeholder="Enter store name"
+                                            className="border p-2 rounded-lg w-full mb-4"
+                                        />
 
-                                        <Label htmlFor="store-email" className="mb-2">Email</Label>
-                                        <Input id="store-email" type="text" placeholder="Enter your email" className="border p-2 rounded-lg w-full mb-4" />
+                                        <Label htmlFor="store-email" className="mb-2">
+                                            Email
+                                        </Label>
+                                        <Input
+                                            id="store-email"
+                                            type="text"
+                                            placeholder="Enter your email"
+                                            className="border p-2 rounded-lg w-full mb-4"
+                                        />
 
-                                        <Label htmlFor="store-address" className="mb-2">Address</Label>
-                                        <Input id="store-address" type="text" placeholder="Enter your address" className="border p-2 rounded-lg w-full mb-4" />
-                                        <Button variant="outline">Add Store</Button>
+                                        <Label htmlFor="store-address" className="mb-2">
+                                            Address
+                                        </Label>
+                                        <Input
+                                            id="store-address"
+                                            type="text"
+                                            placeholder="Enter your address"
+                                            className="border p-2 rounded-lg w-full mb-4"
+                                        />
+
+                                        <Button variant="outline" className="w-full">
+                                            Add Store
+                                        </Button>
                                     </form>
                                 </div>
-
                             </div>
                         </div>
+
                     )}  {activeSection === "Users" && (
                         <>
                             <div className="p-6">
@@ -281,7 +370,7 @@ export default function AdminPage() {
                                                 <SelectItem value="any">Any</SelectItem>
                                                 <SelectItem value="admin">System Administrator</SelectItem>
                                                 <SelectItem value="user">Normal User</SelectItem>
-                                                <SelectItem value="store-owner">Store Owner</SelectItem>
+                                                <SelectItem value="owner">Store Owner</SelectItem>
                                             </SelectContent>
                                         </Select>
                                     </div>

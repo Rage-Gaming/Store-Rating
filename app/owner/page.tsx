@@ -1,5 +1,10 @@
+'use client'
+
 import Navbar from "../../components/NavBar/NavBar";
 import { Star, StarHalf } from "lucide-react";
+import { useUser } from "../context/UserContext";
+import { useEffect } from "react";
+import { redirect } from "next/dist/client/components/navigation"
 
 
 const mockStoreData = [
@@ -93,12 +98,20 @@ const mockStoreRatingData = [
 ]
 
 export default function OwnersPage() {
+    const { username, role } = useUser();
+
+    useEffect(() => {
+        if (role !== "owner") {
+            redirect("/login");
+        }
+    }, []);
+
     return (
         <div className="min-h-screen bg-black text-white">
-            <Navbar name="Rage" title="Store Owner Dashboard" />
+            <Navbar name={username} title="Store Owner" />
 
             <div className="mx-21">
-                <h1 className="text-white text-2xl font-bold">Store Owner Dashboard</h1>
+                <h1 className="text-white text-2xl font-bold">Dashboard</h1>
                 <p className="text-gray-400">No of stores : {mockStoreData.length}</p>
 
 

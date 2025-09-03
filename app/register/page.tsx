@@ -2,12 +2,15 @@
 
 import {useState} from 'react';
 import { redirect } from 'next/navigation';
+import { useUser } from "../context/UserContext";
 
 export default function RegisterPage() {
+  const { setUsername, setRole } = useUser();
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     address: '',
+    role: 'user',
     password: '',
     confirmPassword: '',
   });
@@ -22,8 +25,6 @@ export default function RegisterPage() {
       return;
     }
 
-    console.log(formData)
-
     const res = await fetch("/api/register", {
       method: "POST",
       headers: {
@@ -35,6 +36,8 @@ export default function RegisterPage() {
     const data = await res.json();
     if (data.success) {
       // Handle successful registration (e.g., redirect to login)
+      setUsername(data.user.name);
+      setRole(data.user.role);
       redirect('/login');
     }
 

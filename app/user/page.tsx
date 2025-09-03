@@ -3,8 +3,10 @@
 import Navbar from "@/components/NavBar/NavBar"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Star } from "lucide-react"
+import { useUser } from "../context/UserContext";
+import { redirect } from "next/dist/client/components/navigation"
 
 type Store = {
     id: number
@@ -23,8 +25,15 @@ const mockStores: Store[] = [
 ]
 
 export default function UserPage() {
+    const { username } = useUser();
     const [stores, setStores] = useState(mockStores)
     const [search, setSearch] = useState("")
+
+    useEffect(() => {
+        if (!username) {
+            redirect('/login');
+        }
+    }, [username]);
 
     const handleTempRating = (storeId: number, rating: number) => {
         setStores((prev) =>
@@ -62,7 +71,7 @@ export default function UserPage() {
 
     return (
         <div className="min-h-screen bg-black text-white">
-            <Navbar name="User" title="User Page" />
+            <Navbar name={username} title="User Page" />
 
             <div className="max-w-3xl mx-auto px-6 py-8">
                 <h1 className="text-2xl font-bold">Stores</h1>

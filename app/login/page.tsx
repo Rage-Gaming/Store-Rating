@@ -4,10 +4,11 @@ import { useState, useEffect } from "react";
 import { redirect } from 'next/navigation';
 import { useRouter } from "next/navigation"
 import Loader from "@/components/Loader/loader";
+import { useUser } from "../context/UserContext";
 
 export default function LoginPage() {
   const router = useRouter()
-
+  const { setUsername, setRole } = useUser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -23,6 +24,9 @@ export default function LoginPage() {
 
         const data = await res.json()
         if (data.success) {
+          console.log(data)
+          setUsername(data.user.name);
+          setRole(data.user.role);
           if (data.user.role === "admin") {
             router.push("/admin");
           } else if (data.user.role === "owner") {
@@ -32,7 +36,7 @@ export default function LoginPage() {
           }
         }
       } catch (err) {
-        console.error("❌ Not logged in:", err)
+        console.error("Not logged in:", err)
       }
     }
 
