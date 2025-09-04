@@ -82,8 +82,6 @@ cd store-rating
 ```bash
 git clone https://github.com/Rage-Gaming/Store-Rating.git
 cd store-rating
-
-cd backend
 pnpm install
 
 #or
